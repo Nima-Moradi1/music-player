@@ -12,6 +12,7 @@ Status: PARTIAL
 - Public repository: https://github.com/Nima-Moradi1/music-player.
 
 ## What changed
+- DONE transactional SQLite migration, track/playlist repositories and versioned MMKV settings.
 - DONE domain contracts, stable errors, settings schema and conservative language classification.
 
 - DONE repository skeleton, phase tracking, privacy/security policies, ADR-001.
