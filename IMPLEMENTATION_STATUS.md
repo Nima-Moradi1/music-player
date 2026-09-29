@@ -8,7 +8,7 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [x] P1-T02 Public GitHub repository and isolated feature commits.
 - [x] P1-T03 RN 0.87.1 New Architecture Android/iOS project.
 - [~] P1-T04 Strict TypeScript, lint, formatting, unit/component CI.
-- [ ] P1-T05 Domain contracts and stable errors.
+- [x] P1-T05 Domain contracts and stable errors.
 - [ ] P1-T06 Tokens, accessible components, light/dark, EN/FA, RTL, motion/transparency fallbacks.
 - [ ] P1-T07 SQLite adapter, transactional migrations, repositories and settings migrations.
 - [ ] P1-T08 Managed files, native metadata/streaming SHA-256, atomic import and dedupe.
