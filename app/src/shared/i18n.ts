@@ -101,6 +101,7 @@ export const en = {
   privacyBody:
     'No account, telemetry or server library. Telegram and remote providers are currently disabled.',
   diagnostics: 'Local diagnostics',
+  benchmark: 'Measure library queries',
   fixture: 'Add 10,000 demo entries',
   fixtureBody: 'Development metadata only. These entries contain no audio and cannot play.',
   clearSearch: 'Clear search',
@@ -215,6 +216,7 @@ export const fa: typeof en = {
   privacyBody:
     'بدون حساب، ردیابی و کتابخانه سرور. تلگرام و ارائه‌دهندگان آنلاین فعلاً غیرفعال‌اند.',
   diagnostics: 'عیب‌یابی محلی',
+  benchmark: 'اندازه‌گیری جستجوی کتابخانه',
   fixture: 'افزودن ۱۰٬۰۰۰ ورودی نمونه',
   fixtureBody: 'فقط اطلاعات توسعه؛ این ورودی‌ها فایل صوتی و قابلیت پخش ندارند.',
   clearSearch: 'پاک کردن جستجو',

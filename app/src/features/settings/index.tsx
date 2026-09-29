@@ -8,12 +8,24 @@ import {
   useSettings,
 } from '../../app/providers/Services';
 import {fixtureTrack} from '../../testing/fixtures';
+import {benchmarkLibrary} from '../../testing/benchmark';
 export function SettingsScreen() {
   const {t} = useTranslation();
   const services = useServices();
   const settings = useSettings();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  async function measure() {
+    setBusy(true);
+    setMessage('');
+    try {
+      setMessage(JSON.stringify(await benchmarkLibrary(services.tracks), null, 2));
+    } catch {
+      setMessage(t('errorTitle'));
+    } finally {
+      setBusy(false);
+    }
+  }
   async function seed() {
     setBusy(true);
     setMessage('');
@@ -93,6 +105,14 @@ export function SettingsScreen() {
               void seed();
             }}
             disabled={busy}
+          />
+          <Button
+            label={t('benchmark')}
+            secondary
+            disabled={busy}
+            onPress={() => {
+              void measure();
+            }}
           />
           <Text accessibilityLiveRegion="polite">{message}</Text>
           <Text kind="caption">RN 0.87.1 · SQLite schema 1 · ManagedMedia v1</Text>
