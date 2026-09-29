@@ -90,7 +90,7 @@ function TabBar({state, navigation}: BottomTabBarProps) {
           const selected = index === state.index;
           return (
             <Pressable
-              key={route.key}
+              key={`${route.key}-${rtl}`}
               accessibilityRole="tab"
               accessibilityLabel={t(name.toLowerCase())}
               accessibilityState={{selected}}
