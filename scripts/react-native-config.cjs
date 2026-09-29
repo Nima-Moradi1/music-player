@@ -2,7 +2,10 @@ const {execFileSync} = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-const cli = require.resolve('react-native/cli.js', {paths: [root]});
+const cli = path.join(
+  path.dirname(require.resolve('react-native/package.json', {paths: [root]})),
+  'cli.js',
+);
 const output = execFileSync(process.execPath, [cli, 'config'], {
   cwd: path.join(root, 'app'),
   encoding: 'utf8',
@@ -16,7 +19,9 @@ if (!alias) {
     if (typeof value === 'string' && value.toLowerCase().startsWith(canonical.toLowerCase())) {
       return alias.replace(/[\\/]$/, '') + value.slice(canonical.length);
     }
-    if (Array.isArray(value)) {return value.map(remap);}
+    if (Array.isArray(value)) {
+      return value.map(remap);
+    }
     if (value && typeof value === 'object') {
       return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, remap(item)]));
     }
@@ -24,4 +29,3 @@ if (!alias) {
   };
   process.stdout.write(JSON.stringify(remap(JSON.parse(output))));
 }
-
