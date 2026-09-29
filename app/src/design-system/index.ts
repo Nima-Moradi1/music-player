@@ -4,6 +4,7 @@ export {
   Text,
   Surface,
   Row,
+  Toggle,
   Button,
   IconButton,
   Input,

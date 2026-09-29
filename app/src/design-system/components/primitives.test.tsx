@@ -1,6 +1,6 @@
 import React from 'react';
 import {fireEvent, render} from '@testing-library/react-native';
-import {Button, Text, Surface} from '../primitives';
+import {Button, Text, Surface, Toggle} from '../primitives';
 import {ThemeProvider} from '../theme';
 import {defaultSettings} from '../../domain/settings';
 
@@ -27,4 +27,14 @@ it('supports Persian text direction, large text, and a solid surface fallback', 
   );
   expect(screen.getByText('کتابخانه')).toHaveStyle({textAlign: 'right', writingDirection: 'rtl'});
   expect(screen.getByText('کتابخانه').props.allowFontScaling).not.toBe(false);
+});
+it('exposes one named switch and lets the whole row change its checked state', () => {
+  const change = jest.fn();
+  const screen = render(<Toggle label="Reduce motion" value={false} onValueChange={change} />);
+  const toggle = screen.getByRole('switch', {name: 'Reduce motion'});
+  expect(toggle).not.toBeChecked();
+  fireEvent.press(toggle);
+  expect(change).toHaveBeenCalledWith(true);
+  screen.rerender(<Toggle label="Reduce motion" value onValueChange={change} />);
+  expect(screen.getByRole('switch', {name: 'Reduce motion'})).toBeChecked();
 });

@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
-import {Switch, View, StyleSheet} from 'react-native';
 import {useTranslation} from 'react-i18next';
-import {Button, Page, Row, Surface, Text, tokens} from '../../design-system';
+import {Button, Page, Row, Surface, Text, Toggle} from '../../design-system';
 import {
   refreshLibrary,
   updateSettings,
@@ -71,18 +70,14 @@ export function SettingsScreen() {
       </Row>
       <Text kind="title">{t('accessibility')}</Text>
       {(['reduceMotion', 'reduceTransparency', 'highContrast'] as const).map(key => (
-        <Row key={key} style={styles.between}>
-          <View style={styles.fill}>
-            <Text>{t(key)}</Text>
-          </View>
-          <Switch
-            accessibilityLabel={t(key)}
-            value={settings[key]}
-            onValueChange={value => {
-              void updateSettings(services, {[key]: value});
-            }}
-          />
-        </Row>
+        <Toggle
+          key={key}
+          label={t(key)}
+          value={settings[key]}
+          onValueChange={value => {
+            void updateSettings(services, {[key]: value});
+          }}
+        />
       ))}
       <Surface>
         <Text kind="title">{t('privacy')}</Text>
@@ -106,7 +101,3 @@ export function SettingsScreen() {
     </Page>
   );
 }
-const styles = StyleSheet.create({
-  between: {justifyContent: 'space-between', minHeight: tokens.size.touch},
-  fill: {flex: 1},
-});

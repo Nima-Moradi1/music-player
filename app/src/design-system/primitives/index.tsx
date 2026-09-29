@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
+  Switch,
   StyleSheet,
   Text as NativeText,
   TextInput,
@@ -69,6 +70,33 @@ export function Row({children, style}: React.PropsWithChildren<{style?: StylePro
     <View style={[styles.row, {flexDirection: rtl ? 'row-reverse' : 'row'}, style]}>
       {children}
     </View>
+  );
+}
+export function Toggle({
+  label,
+  value,
+  onValueChange,
+}: {
+  label: string;
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+}) {
+  const {rtl} = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="switch"
+      accessibilityLabel={label}
+      accessibilityState={{checked: value}}
+      onPress={() => onValueChange(!value)}
+      style={[styles.row, styles.toggle, {flexDirection: rtl ? 'row-reverse' : 'row'}]}
+    >
+      <View style={styles.fill}>
+        <Text>{label}</Text>
+      </View>
+      <View pointerEvents="none" accessible={false} importantForAccessibility="no-hide-descendants">
+        <Switch accessible={false} value={value} />
+      </View>
+    </Pressable>
   );
 }
 export function Button({
@@ -227,6 +255,7 @@ export const styles = StyleSheet.create({
     gap: tokens.spacing.md,
   },
   row: {alignItems: 'center', gap: tokens.spacing.md},
+  toggle: {minHeight: tokens.size.touch, justifyContent: 'space-between'},
   button: {
     minHeight: tokens.size.touch,
     paddingHorizontal: tokens.spacing.lg,
