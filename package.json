@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@11.18.0",
-  "engines": { "node": ">=22.13.0" },
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "start": "pnpm --filter @music-player/app start",
     "android": "pnpm --filter @music-player/app android",
@@ -13,5 +15,8 @@
     "test": "pnpm --filter @music-player/app test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "3.9.9"
   }
 }

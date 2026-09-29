@@ -5,9 +5,9 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 ## Phase 1 — Foundation
 
 - [x] P1-T01 Repository structure, contract, phase docs, ADR-001, privacy/security.
-- [~] P1-T02 Public GitHub repository and isolated feature commits.
-- [ ] P1-T03 RN 0.87.1 New Architecture Android/iOS project.
-- [ ] P1-T04 Strict TypeScript, lint, formatting, unit/component CI.
+- [x] P1-T02 Public GitHub repository and isolated feature commits.
+- [x] P1-T03 RN 0.87.1 New Architecture Android/iOS project.
+- [~] P1-T04 Strict TypeScript, lint, formatting, unit/component CI.
 - [ ] P1-T05 Domain contracts and stable errors.
 - [ ] P1-T06 Tokens, accessible components, light/dark, EN/FA, RTL, motion/transparency fallbacks.
 - [ ] P1-T07 SQLite adapter, transactional migrations, repositories and settings migrations.
@@ -52,4 +52,3 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [ ] P5-T03 Device performance, battery/thermal/memory, 24h playback and upgrade tests.
 - [ ] P5-T04 Native/E2E/release CI, versioning, signing and smoke tests.
 - [ ] P5-T05 Verified Android AAB/APK and iOS archive/TestFlight guides and artifacts.
-

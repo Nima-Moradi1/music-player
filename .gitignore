@@ -20,4 +20,13 @@ app/ios/.xcode.env.local
 .DS_Store
 *.log
 *.tsbuildinfo
-
+.idea/
+app/android/.cxx/
+app/android/.kotlin/
+**/xcuserdata/
+**/DerivedData/
+*.xcuserstate
+*.ipa
+*.jsbundle
+.metro-health-check*
+vendor/bundle/

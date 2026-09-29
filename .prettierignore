@@ -1,0 +1,8 @@
+node_modules
+.tools
+pnpm-lock.yaml
+docs/IMPLEMENTATION_SPEC.md
+app/android
+app/ios
+coverage
+artifacts
