@@ -9,15 +9,15 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [x] P1-T03 RN 0.87.1 New Architecture Android/iOS project.
 - [~] P1-T04 Strict TypeScript, lint, formatting, unit/component CI.
 - [x] P1-T05 Domain contracts and stable errors.
-- [ ] P1-T06 Tokens, accessible components, light/dark, EN/FA, RTL, motion/transparency fallbacks.
+- [~] P1-T06 Tokens, accessible components, light/dark, EN/FA, RTL, motion/transparency fallbacks.
 - [x] P1-T07 SQLite adapter, transactional migrations, repositories and settings migrations.
-- [ ] P1-T08 Managed files, native metadata/streaming SHA-256, atomic import and dedupe.
-- [ ] P1-T09 Onboarding, Home, Library and all browse dimensions.
-- [ ] P1-T10 Search, favorites, playlists CRUD, sorting/filtering.
-- [ ] P1-T11 Manual import, 10k fixture, diagnostics, mini-player placeholder.
-- [ ] P1-T12 Android debug build and boot.
+- [~] P1-T08 Managed files, native metadata/streaming SHA-256, atomic import and dedupe.
+- [~] P1-T09 Onboarding, Home, Library and all browse dimensions.
+- [~] P1-T10 Search, favorites, playlists CRUD, sorting/filtering.
+- [~] P1-T11 Manual import, 10k fixture, diagnostics, mini-player placeholder.
+- [~] P1-T12 Android debug build and boot.
 - [!] P1-T13 iOS debug build and boot — BLOCKER-P1-IOS: Windows; macOS CI needed.
-- [ ] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates.
+- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates.
 
 ## Phase 2 — Native audio
 
