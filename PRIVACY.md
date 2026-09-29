@@ -7,4 +7,3 @@ Local file import is explicit. Imported files are copied to app-managed storage;
 Telegram is optional and is not enabled in Phase 1. When implemented, it will authenticate a separate TDLib client session and scan only sources the user explicitly chooses. It will not read the Telegram app's private cache, manipulate read status, delete original messages, or train AI models. Disconnecting must preserve imported music unless the user requests deletion separately.
 
 Remote lyrics/recommendation providers are disabled until their terms and minimum metadata requests are documented and accepted for production. They must never receive audio, a user's complete library, Telegram content, or history. No telemetry by default. Any future diagnostics export must require a user action and redact private fields.
-

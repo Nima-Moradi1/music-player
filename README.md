@@ -19,4 +19,3 @@ pnpm start
 ```
 
 There is no backend and no telemetry. Audio, library metadata, playlists, and future Telegram sessions stay on the device. Branding remains replaceable through `APP_NAME`.
-

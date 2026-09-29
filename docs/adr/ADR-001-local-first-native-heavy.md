@@ -7,4 +7,3 @@ Use bare React Native 0.87.x with React 19, strict TypeScript, Hermes, and the N
 Dependency direction: feature → domain interface ← infrastructure/native implementation. Composition occurs in app bootstrap. Feature screens never access raw native modules. Zustand holds ephemeral state; TanStack Query is reserved for optional remote providers.
 
 No backend is created by default. No Expo-managed project or React Native Track Player. Telegram and DSP are explicitly deferred beyond the first session, and every phase remains gated on its tests and device checks.
-
