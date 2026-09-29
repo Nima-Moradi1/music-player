@@ -7,7 +7,6 @@ import type {
 
 // Node's real SQLite is used only in integration tests and desktop benchmarks, never bundled.
 export function nodeTestDatabase(): Database {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const {DatabaseSync} = require('node:sqlite') as {
     DatabaseSync: new (path: string) => {
       prepare(sql: string): {

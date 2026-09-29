@@ -8,21 +8,19 @@ describe('managed import transaction', () => {
   function setup(existing = false) {
     const files: jest.Mocked<ManagedFilesystem> = {
       stage: jest.fn().mockResolvedValue('temp'),
-      inspect: jest
-        .fn()
-        .mockResolvedValue({
-          path: 'temp',
-          sha256: track.contentHash,
-          mimeType: 'audio/mpeg',
-          extension: 'mp3',
-          fileSize: 100,
-          title: 'Music',
-          artist: 'Artist',
-          album: '',
-          genre: '',
-          durationMs: 10000,
-          artworkPath: null,
-        }),
+      inspect: jest.fn().mockResolvedValue({
+        path: 'temp',
+        sha256: track.contentHash,
+        mimeType: 'audio/mpeg',
+        extension: 'mp3',
+        fileSize: 100,
+        title: 'Music',
+        artist: 'Artist',
+        album: '',
+        genre: '',
+        durationMs: 10000,
+        artworkPath: null,
+      }),
       promote: jest.fn().mockResolvedValue('managed'),
       remove: jest.fn().mockResolvedValue(undefined),
       freeBytes: jest.fn().mockResolvedValue(1e9),
