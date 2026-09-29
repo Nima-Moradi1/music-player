@@ -2,9 +2,25 @@ import React, {useEffect, useState} from 'react';
 import {StatusBar, StyleSheet, View} from 'react-native';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {ThemeProvider, useTheme, Button, EmptyState, Page, Loading} from '../../design-system';
+import {
+  ThemeProvider,
+  useTheme,
+  Button,
+  EmptyState,
+  Page,
+  Loading,
+  Row,
+  Text,
+} from '../../design-system';
+import {useTranslation} from 'react-i18next';
 import {defaultSettings} from '../../domain/settings';
-import {ServicesProvider, useSettings, type Services} from './Services';
+import {
+  ServicesProvider,
+  useSettings,
+  useActionError,
+  useServices,
+  type Services,
+} from './Services';
 import {bootstrap} from '../bootstrap';
 import {AppNavigation} from '../navigation';
 function Content() {
@@ -23,9 +39,27 @@ function NavigationFrame() {
       edges={['top', 'left', 'right']}
     >
       <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
+      <ActionError />
       <AppNavigation />
     </SafeAreaView>
   );
+}
+function ActionError() {
+  const error = useActionError();
+  const services = useServices();
+  const {t} = useTranslation();
+  return error ? (
+    <Row>
+      <View style={styles.fill}>
+        <Text accessibilityLiveRegion="assertive">{t('actionFailed')}</Text>
+      </View>
+      <Button
+        secondary
+        label={t('done')}
+        onPress={() => services.state.setState({lastError: null})}
+      />
+    </Row>
+  ) : null;
 }
 export function AppShell() {
   const [services, setServices] = useState<Services | null>(null);

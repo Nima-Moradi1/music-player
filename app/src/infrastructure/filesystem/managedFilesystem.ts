@@ -22,7 +22,11 @@ export function aborted(): Error {
 }
 export class NativeManagedFilesystem implements ManagedFilesystem {
   constructor(private readonly bridge: ManagedMediaNativeV1 = managedMediaNative()) {}
-  private async cancellable<T>(signal: AbortSignal, work: (id: string) => Promise<T>): Promise<T> {
+  private async cancellable<T>(
+    signal: AbortSignal,
+    work: (id: string) => Promise<T>,
+    cleanup?: (result: T) => Promise<void>,
+  ): Promise<T> {
     if (signal.aborted) {
       throw aborted();
     }
@@ -35,6 +39,9 @@ export class NativeManagedFilesystem implements ManagedFilesystem {
     try {
       const result = await work(id);
       if (signal.aborted) {
+        if (cleanup) {
+          await cleanup(result);
+        }
         throw aborted();
       }
       return result;
@@ -49,7 +56,11 @@ export class NativeManagedFilesystem implements ManagedFilesystem {
     }
   }
   stage(uri: string, maxBytes: number, signal: AbortSignal): Promise<string> {
-    return this.cancellable(signal, id => this.bridge.stage(id, uri, maxBytes));
+    return this.cancellable(
+      signal,
+      id => this.bridge.stage(id, uri, maxBytes),
+      path => this.bridge.remove(path),
+    );
   }
   async inspect(path: string, signal: AbortSignal): Promise<InspectedMedia> {
     return inspectionSchema.parse(

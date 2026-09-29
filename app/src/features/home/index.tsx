@@ -15,7 +15,7 @@ import {
   TrackRow,
 } from '../../design-system';
 import type {RootStackParamList} from '../../app/navigation/types';
-import {useLibraryVersion, useServices, refreshLibrary} from '../../app/providers/Services';
+import {useLibraryVersion, useServices, runLibraryCommand} from '../../app/providers/Services';
 import {useTracks} from '../../app/providers/useTracks';
 import {ImportButton} from '../imports';
 export function HomeScreen() {
@@ -77,9 +77,9 @@ export function HomeScreen() {
                 navigation.navigate('Details', {trackId: track.id});
               }}
               onFavorite={() => {
-                void services.tracks
-                  .setFavorite(track.id, !track.favorite)
-                  .then(() => refreshLibrary(services));
+                void runLibraryCommand(services, () =>
+                  services.tracks.setFavorite(track.id, !track.favorite),
+                );
               }}
             />
           ))}

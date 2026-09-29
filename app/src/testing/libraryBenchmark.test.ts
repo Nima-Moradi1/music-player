@@ -7,17 +7,17 @@ it('queries a real 10,000-track SQLite fixture with bounded pages', async () => 
   await migrate(database);
   const repository = new SqliteTrackRepository(database);
   try {
-    const seedStart = performance.now();
+    const seedStart = Date.now();
     for (let i = 0; i < 10000; i++) {
       await repository.save(fixtureTrack(i), {type: 'fixture', originalFilename: `fixture-${i}`});
     }
-    const seedMs = performance.now() - seedStart;
-    const listStart = performance.now();
+    const seedMs = Date.now() - seedStart;
+    const listStart = Date.now();
     expect(await repository.list()).toHaveLength(60);
-    const listMs = performance.now() - listStart;
-    const searchStart = performance.now();
+    const listMs = Date.now() - listStart;
+    const searchStart = Date.now();
     const result = await repository.list({search: 'demo artist 1499'});
-    const searchMs = performance.now() - searchStart;
+    const searchMs = Date.now() - searchStart;
     expect(result.length).toBeGreaterThan(0);
     expect(await repository.count()).toBe(10000);
     console.info(

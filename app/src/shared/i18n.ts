@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import {initReactI18next} from 'react-i18next';
 
 export const en = {
+  actionFailed: 'That change could not be saved. Try again.',
   appName: 'APP_NAME',
   home: 'Home',
   library: 'Library',
@@ -116,6 +117,7 @@ export const en = {
   app_download: 'Permitted download',
 };
 export const fa: typeof en = {
+  actionFailed: '????? ????? ???. ?????? ???? ????.',
   appName: 'APP_NAME',
   home: 'خانه',
   library: 'کتابخانه',

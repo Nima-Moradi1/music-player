@@ -15,7 +15,12 @@ import {
   tokens,
   TrackRow,
 } from '../../design-system';
-import {refreshLibrary, useLibraryVersion, useServices} from '../../app/providers/Services';
+import {
+  refreshLibrary,
+  useLibraryVersion,
+  useServices,
+  runLibraryCommand,
+} from '../../app/providers/Services';
 import {useTracks} from '../../app/providers/useTracks';
 import type {BrowseDimension, Collection, LibraryQuery} from '../../domain/track';
 import type {RootStackParamList} from '../../app/navigation/types';
@@ -184,9 +189,9 @@ export function LibraryScreen() {
                     navigation.navigate('Details', {trackId: item.id});
                   }}
                   onFavorite={() => {
-                    void services.tracks
-                      .setFavorite(item.id, !item.favorite)
-                      .then(() => refreshLibrary(services));
+                    void runLibraryCommand(services, () =>
+                      services.tracks.setFavorite(item.id, !item.favorite),
+                    );
                   }}
                 />
               )}
