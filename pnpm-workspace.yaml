@@ -1,0 +1,5 @@
+packages:
+  - app
+nodeLinker: hoisted
+minimumReleaseAge: 1440
+

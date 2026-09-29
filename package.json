@@ -1,0 +1,17 @@
+{
+  "name": "music-player-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.18.0",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "start": "pnpm --filter @music-player/app start",
+    "android": "pnpm --filter @music-player/app android",
+    "ios": "pnpm --filter @music-player/app ios",
+    "typecheck": "pnpm --filter @music-player/app typecheck",
+    "lint": "pnpm --filter @music-player/app lint",
+    "test": "pnpm --filter @music-player/app test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  }
+}
