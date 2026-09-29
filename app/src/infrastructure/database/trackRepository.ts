@@ -43,11 +43,17 @@ function queryWhere(query: LibraryQuery): {sql: string; params: SqlValue[]} {
   const params: SqlValue[] = [];
   if (query.search?.trim()) {
     const pattern = `%${normalizeSearch(query.search).replace(/[\\%_]/g, '\\$&')}%`;
-    conditions.push(`(t.normalized_title LIKE ? ESCAPE '\\' OR EXISTS(SELECT 1 FROM track_artists ta JOIN artists ar ON ar.id=ta.artist_id WHERE ta.track_id=t.id AND ar.normalized_name LIKE ? ESCAPE '\\') OR a.normalized_title LIKE ? ESCAPE '\\'
-      OR EXISTS(SELECT 1 FROM track_genres tg JOIN genres g ON g.id=tg.genre_id WHERE tg.track_id=t.id AND g.name LIKE ? ESCAPE '\\')
-      OR EXISTS(SELECT 1 FROM track_sources s WHERE s.track_id=t.id AND (s.original_filename LIKE ? ESCAPE '\\' OR s.source_type LIKE ? ESCAPE '\\'))
-      OR t.language_code LIKE ? ESCAPE '\\'
-      OR EXISTS(SELECT 1 FROM playlist_tracks pt JOIN playlists p ON p.id=pt.playlist_id WHERE pt.track_id=t.id AND p.name LIKE ? ESCAPE '\\'))`);
+    // Resolve matching identities once per dimension instead of running seven
+    // correlated lookups for every track in a large library.
+    conditions.push(`t.id IN (
+      SELECT id FROM tracks WHERE normalized_title LIKE ? ESCAPE '\\'
+      UNION SELECT ta.track_id FROM artists ar JOIN track_artists ta ON ta.artist_id=ar.id WHERE ar.normalized_name LIKE ? ESCAPE '\\'
+      UNION SELECT tr.id FROM albums al JOIN tracks tr ON tr.album_id=al.id WHERE al.normalized_title LIKE ? ESCAPE '\\'
+      UNION SELECT tg.track_id FROM genres g JOIN track_genres tg ON tg.genre_id=g.id WHERE g.name LIKE ? ESCAPE '\\'
+      UNION SELECT s.track_id FROM track_sources s WHERE s.original_filename LIKE ? ESCAPE '\\' OR s.source_type LIKE ? ESCAPE '\\'
+      UNION SELECT id FROM tracks WHERE language_code LIKE ? ESCAPE '\\'
+      UNION SELECT pt.track_id FROM playlists p JOIN playlist_tracks pt ON pt.playlist_id=p.id WHERE p.name LIKE ? ESCAPE '\\'
+    )`);
     params.push(...Array<SqlValue>(8).fill(pattern));
   }
   if (query.language) {

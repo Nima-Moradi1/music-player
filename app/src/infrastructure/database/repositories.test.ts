@@ -66,6 +66,30 @@ describe('SQLite integration', () => {
     expect((await db.execute('SELECT * FROM track_sources')).rows).toHaveLength(2);
     expect((await tracks.findByHash('a'.repeat(64)))?.id).toBe(track.id);
   });
+  it('searches every metadata dimension and follows playlist membership changes', async () => {
+    const track = fixtureTrack(1);
+    await tracks.save(track, {type: 'manual_import', originalFilename: '100%_mix.mp3'});
+    await tracks.save(fixtureTrack(2), {type: 'fixture', originalFilename: 'other.mp3'});
+    await playlists.create('evening', 'Evening collection');
+    await playlists.addTrack('evening', track.id);
+    for (const search of [
+      track.title,
+      track.artist,
+      track.album,
+      track.genre,
+      '100%_',
+      'manual_import',
+      'en',
+      'Evening collection',
+    ]) {
+      expect((await tracks.list({search})).map(item => item.id)).toEqual([track.id]);
+    }
+    await playlists.rename('evening', 'Quiet collection');
+    expect(await tracks.list({search: 'Evening collection'})).toHaveLength(0);
+    expect((await tracks.list({search: 'Quiet collection'}))[0]?.id).toBe(track.id);
+    await playlists.removeTrack('evening', track.id);
+    expect(await tracks.list({search: 'Quiet collection'})).toHaveLength(0);
+  });
   it('creates, renames and deletes playlists without deleting songs', async () => {
     const track = fixtureTrack(1);
     await tracks.save(track, {
