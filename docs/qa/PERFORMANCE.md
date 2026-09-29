@@ -8,7 +8,8 @@ Phase 1 measurements, 2026-09-29. This is a desktop baseline, not a reference-de
 | ----------------------------------------- | -------- | ---------- | ------------- |
 | Desktop, before native compile contention | 2,100 ms | 3 ms       | 43 ms         |
 | Desktop, concurrent C++/Metro work        | 3,823 ms | 2 ms       | 110 ms        |
-| Desktop, final idle verification          | 2,366 ms | 3 ms       | 35 ms         |
+| Desktop, before search optimization       | 2,366 ms | 3 ms       | 35 ms         |
+| Desktop, final optimized verification     | 2,240 ms | 2 ms       | 15 ms         |
 
 The busy run exceeds the 100 ms search target. Timings are reported rather than used as flaky CI assertions. Record Android/iOS device model, OS, build mode, cold/warm startup, memory and p50/p95 query times before closing the phase. Native artwork decode/cache budgets, battery, frame pacing and 50k stress remain later gates.
 
