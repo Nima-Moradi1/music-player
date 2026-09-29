@@ -16,7 +16,7 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [~] P1-T10 Search, favorites, playlists CRUD, sorting/filtering.
 - [~] P1-T11 Manual import, 10k fixture, diagnostics, mini-player placeholder.
 - [x] P1-T12 Android debug build, native tests and emulator boot/navigation.
-- [~] P1-T13 iOS debug build passes in macOS CI; simulator launch artifact under verification.
+- [x] P1-T13 iOS debug build and simulator boot in macOS CI; onboarding screenshot/logs reviewed.
 - [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates.
 
 Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/PHASE_01_FOUNDATION.md` and `docs/qa/`. Later phases remain gated by its exit; the first-session contract also prohibits Telegram/DSP work.

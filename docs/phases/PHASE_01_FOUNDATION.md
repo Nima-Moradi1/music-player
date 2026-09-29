@@ -86,7 +86,7 @@ Tests:
 
 Status: DONE
 Depends: P1-T05
-Files: app/src/infrastructure/database/, infrastructure/settings/
+Files: app/src/infrastructure/database/, database/settingsRepository.ts
 Acceptance:
 
 - 21-table first migration, one writer queue, repository-owned queries, versioned settings, transactional writes.
@@ -132,7 +132,7 @@ Acceptance:
 
 Tests:
 
-- SQLite/component tests and native favorite/detail actions pass. Full playlist/restart matrix pending.
+- SQLite/component tests and native favorite/detail actions pass. Android playlist create/rename and persisted favorite/playlist cold restart pass; membership/delete UI matrix pending.
 
 ### P1-T11 — Import, fixtures, diagnostics and preview
 
@@ -145,7 +145,7 @@ Acceptance:
 
 Tests:
 
-- Emulator stores/browses 10k entries. End-to-end audio-file import pending.
+- Emulator stores/browses 10k entries; MP3 import and duplicate/provenance checks pass. Full codec/storage/cancellation matrix pending.
 
 ### P1-T12 — Android build and boot
 
@@ -162,7 +162,7 @@ Tests:
 
 ### P1-T13 — iOS build and boot
 
-Status: IN PROGRESS
+Status: DONE
 Depends: P1-T03, P1-T04
 Files: iOS project, scripts/ios-simulator-smoke.sh, CI/iOS guide
 Acceptance:
@@ -171,7 +171,7 @@ Acceptance:
 
 Tests:
 
-- Native simulator build passes at a5825b5. Launch artifact requires review; physical iOS access external.
+- Native simulator build/boot pass at b637fac. Onboarding screenshot/logs reviewed; physical iOS access external.
 
 ### P1-T14 — Design, performance and device gate
 
