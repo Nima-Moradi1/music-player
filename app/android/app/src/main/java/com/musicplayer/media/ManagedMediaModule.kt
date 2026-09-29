@@ -61,7 +61,11 @@ class ManagedMediaModule(private val context: ReactApplicationContext) : ReactCo
   }
   @ReactMethod fun inspect(id: String, path: String, promise: Promise) = task(id, promise) { cancelled ->
     val file = checked(path)
-    val header = FileInputStream(file).use { it.readNBytes(12) }
+    val header = FileInputStream(file).use { input ->
+      val bytes = ByteArray(12)
+      require(input.read(bytes) == 12) { "IMPORT_CORRUPT_FILE" }
+      bytes
+    }
     val (mime, extension) = MediaSafety.format(header)
     val digest = MessageDigest.getInstance("SHA-256")
     FileInputStream(file).use { input ->
@@ -104,4 +108,3 @@ class ManagedMediaPackage : ReactPackage {
   override fun createNativeModules(context: ReactApplicationContext): List<NativeModule> = listOf(ManagedMediaModule(context))
   override fun createViewManagers(context: ReactApplicationContext): List<ViewManager<*, *>> = emptyList()
 }
-
