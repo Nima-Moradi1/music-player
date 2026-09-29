@@ -117,9 +117,12 @@ function TabBar({state, navigation}: BottomTabBarProps) {
     </View>
   );
 }
+function renderTabBar(props: BottomTabBarProps) {
+  return <TabBar {...props} />;
+}
 function MainTabs() {
   return (
-    <Tabs.Navigator tabBar={TabBar} screenOptions={{headerShown: false}}>
+    <Tabs.Navigator tabBar={renderTabBar} screenOptions={{headerShown: false}}>
       <Tabs.Screen name="Home" component={HomeScreen} />
       <Tabs.Screen name="Library" component={LibraryScreen} />
       <Tabs.Screen name="Discover" component={DiscoveryScreen} />
