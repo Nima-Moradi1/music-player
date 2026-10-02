@@ -1,6 +1,8 @@
 package com.musicplayer.media
 
 import android.media.MediaMetadataRetriever
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import com.facebook.react.bridge.*
 import com.facebook.react.ReactPackage
@@ -90,6 +92,7 @@ class ManagedMediaModule(private val context: ReactApplicationContext) : ReactCo
         val read = input.read(buffer); if (read < 0) break; digest.update(buffer, 0, read)
       }
     }
+    val hash = digest.digest().joinToString("") { "%02x".format(it) }
     val metadata = MediaMetadataRetriever()
     try {
       metadata.setDataSource(file.path)
@@ -97,15 +100,36 @@ class ManagedMediaModule(private val context: ReactApplicationContext) : ReactCo
       val duration = metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0
       require(duration > 0) { "IMPORT_CORRUPT_FILE" }
       JSONObject().apply {
-        put("path", path); put("sha256", digest.digest().joinToString("") { "%02x".format(it) })
+        put("path", path); put("sha256", hash)
         put("mimeType", mime); put("extension", extension); put("fileSize", file.length())
         put("title", metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: "")
         put("artist", metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: "")
         put("album", metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: "")
         put("genre", metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE) ?: "")
-        put("durationMs", duration); put("artworkPath", JSONObject.NULL)
+        put("durationMs", duration); put("artworkPath", extractArtwork(metadata.embeddedPicture, hash) ?: JSONObject.NULL)
       }.toString()
     } finally { metadata.release() }
+  }
+  private fun extractArtwork(data: ByteArray?, hash: String): String? {
+    if (data == null || data.isEmpty() || data.size > 8 * 1024 * 1024) return null
+    val folder = File(root, "artwork").apply { mkdirs() }
+    val target = File(folder, "$hash.jpg")
+    if (target.exists()) return Uri.fromFile(target).toString()
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeByteArray(data, 0, data.size, bounds)
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0 || bounds.outWidth.toLong() * bounds.outHeight > 64_000_000) return null
+    val options = BitmapFactory.Options().apply { inSampleSize = 1 }
+    while (maxOf(bounds.outWidth, bounds.outHeight) / options.inSampleSize > 512) options.inSampleSize *= 2
+    val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size, options) ?: return null
+    val temp = File(folder, UUID.randomUUID().toString() + ".part")
+    try {
+      temp.outputStream().use { output ->
+        require(bitmap.compress(Bitmap.CompressFormat.JPEG, 85, output)) { "IMPORT_CORRUPT_FILE" }
+        output.fd.sync()
+      }
+      require(temp.renameTo(target)) { "IMPORT_NO_SPACE" }
+      return Uri.fromFile(target).toString()
+    } finally { bitmap.recycle(); temp.delete() }
   }
   @ReactMethod fun promote(path: String, hash: String, extension: String, promise: Promise) = task(UUID.randomUUID().toString(), promise) { _ ->
     val source = checked(path)

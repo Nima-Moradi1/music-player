@@ -34,7 +34,6 @@ export class ImportMedia implements MediaImporter {
       }
       staged = await this.files.stage(uri, this.maxBytes(), signal);
       const media = await this.files.inspect(staged, signal);
-      artwork = media.artworkPath;
       await this.journal?.inspected(jobId, staged, media.sha256);
       if (signal.aborted) {
         throw new Error('Cancelled');
@@ -42,12 +41,12 @@ export class ImportMedia implements MediaImporter {
       const existing = await this.tracks.findByHash(media.sha256);
       if (existing) {
         // Artwork is hash-addressed and may already belong to the original track.
-        artwork = null;
         await this.tracks.addSource(existing.id, source);
         committed = true;
         await this.journal?.finish(jobId, existing.id, null);
         return {track: existing, duplicate: true};
       }
+      artwork = media.artworkPath;
       const classification = classifyLanguage({
         text: `${media.title} ${media.artist}`,
         ...(media.metadataLanguage ? {metadataLanguage: media.metadataLanguage} : {}),

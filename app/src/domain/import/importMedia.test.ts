@@ -1,6 +1,6 @@
 import {ImportMedia} from './importMedia';
 import {fixtureTrack} from '../../testing/fixtures';
-import type {ManagedFilesystem} from './index';
+import type {ImportJournal, ManagedFilesystem} from './index';
 import type {TrackRepository} from '../track';
 describe('managed import transaction', () => {
   const track = {...fixtureTrack(1), contentHash: 'a'.repeat(64)};
@@ -85,5 +85,61 @@ describe('managed import transaction', () => {
     const abort = new AbortController();
     abort.abort();
     await expect(importer.import('picked', source, abort.signal)).rejects.toThrow();
+  });
+  it('compensates cancellation after atomic promotion without publishing a row', async () => {
+    const {files, tracks, importer} = setup();
+    const abort = new AbortController();
+    files.promote.mockImplementation(async () => {
+      abort.abort();
+      return 'managed';
+    });
+    await expect(importer.import('picked', source, abort.signal)).rejects.toThrow('Cancelled');
+    expect(tracks.save).not.toHaveBeenCalled();
+    expect(files.remove).toHaveBeenCalledWith('managed');
+  });
+  it('preserves committed audio if the final journal update fails', async () => {
+    const {files, tracks} = setup();
+    const journal: ImportJournal = {
+      begin: async () => {},
+      inspected: async () => {},
+      finish: async () => {
+        throw new Error('Journal unavailable');
+      },
+    };
+    const importer = new ImportMedia(
+      files,
+      tracks,
+      async () => track.id,
+      () => 1e8,
+      journal,
+    );
+    await expect(importer.import('picked', source, new AbortController().signal)).rejects.toThrow(
+      'Journal unavailable',
+    );
+    expect(tracks.save).toHaveBeenCalled();
+    expect(files.remove).not.toHaveBeenCalledWith('managed');
+  });
+  it('never deletes artwork belonging to a duplicate when cancellation races inspection', async () => {
+    const {files, tracks, importer} = setup(true);
+    const abort = new AbortController();
+    files.inspect.mockImplementation(async () => {
+      abort.abort();
+      return {
+        path: 'temp',
+        sha256: track.contentHash,
+        mimeType: 'audio/mpeg',
+        extension: 'mp3',
+        fileSize: 100,
+        title: 'Music',
+        artist: '',
+        album: '',
+        genre: '',
+        durationMs: 10000,
+        artworkPath: 'existing-artwork',
+      };
+    });
+    await expect(importer.import('picked', source, abort.signal)).rejects.toThrow('Cancelled');
+    expect(files.remove).not.toHaveBeenCalledWith('existing-artwork');
+    expect(tracks.addSource).not.toHaveBeenCalled();
   });
 });

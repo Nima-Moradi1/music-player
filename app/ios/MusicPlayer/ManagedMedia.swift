@@ -1,6 +1,8 @@
 import AVFoundation
 import CryptoKit
 import Foundation
+import ImageIO
+import UniformTypeIdentifiers
 import React
 
 @objc(ManagedMedia)
@@ -111,14 +113,37 @@ final class ManagedMedia: NSObject {
           return (try? await item.load(.stringValue)) ?? ""
         }
         let size = (try self.files.attributesOfItem(atPath: url.path)[.size] as? NSNumber)?.int64Value ?? 0
-        let object: [String: Any] = ["path": path, "sha256": hash.finalize().map { String(format: "%02x", $0) }.joined(),
+        let digest = hash.finalize().map { String(format: "%02x", $0) }.joined()
+        var artwork: String?
+        if let item = metadata.first(where: { $0.commonKey == .commonKeyArtwork }),
+           let data = try? await item.load(.dataValue), data.count <= 8 * 1024 * 1024 {
+          artwork = try self.extractArtwork(data, hash: digest)
+        }
+        let object: [String: Any] = ["path": path, "sha256": digest,
           "mimeType": mime, "extension": ext, "fileSize": size, "durationMs": Int(duration.seconds * 1000),
           "title": await value(.commonKeyTitle), "artist": await value(.commonKeyArtist), "album": await value(.commonKeyAlbumName),
-          "genre": "", "artworkPath": NSNull()]
+          "genre": await value(.commonKeyType), "artworkPath": artwork as Any? ?? NSNull()]
         try self.check(id)
         resolve(String(data: try JSONSerialization.data(withJSONObject: object), encoding: .utf8))
       } catch { self.failure(error, reject) }
     }
+  }
+  private func extractArtwork(_ data: Data, hash: String) throws -> String? {
+    let target = try folder("artwork").appendingPathComponent(hash + ".jpg")
+    if files.fileExists(atPath: target.path) { return target.absoluteString }
+    guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+          let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceThumbnailMaxPixelSize: 512,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceShouldCacheImmediately: false
+          ] as CFDictionary) else { return nil }
+    let output = NSMutableData()
+    guard let destination = CGImageDestinationCreateWithData(output, UTType.jpeg.identifier as CFString, 1, nil) else { return nil }
+    CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: 0.85] as CFDictionary)
+    guard CGImageDestinationFinalize(destination) else { return nil }
+    try (output as Data).write(to: target, options: .atomic)
+    return target.absoluteString
   }
   @objc func promote(_ path: String, hash: String, ext: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.global(qos: .utility).async {
