@@ -11,6 +11,7 @@ it('removes a staged file when cancellation races with native completion', async
     inspect: jest.fn(),
     promote: jest.fn(),
     remove: jest.fn().mockResolvedValue(undefined),
+    reconcile: jest.fn().mockResolvedValue(undefined),
     freeBytes: jest.fn(),
     cancel: jest.fn(),
   };

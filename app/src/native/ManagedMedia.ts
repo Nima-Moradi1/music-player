@@ -6,6 +6,7 @@ export interface ManagedMediaNativeV1 {
   promote(path: string, hash: string, extension: string): Promise<string>;
   remove(path: string): Promise<void>;
   freeBytes(): Promise<number>;
+  reconcile(ownedPathsJson: string): Promise<void>;
   cancel(jobId: string): void;
 }
 // Version 1 bridge. NativeModules is isolated here; New Architecture interop owns serialization.

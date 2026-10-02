@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import org.json.JSONObject
+import org.json.JSONArray
 
 class ManagedMediaModule(private val context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {
   private val executor = Executors.newFixedThreadPool(2)
@@ -37,6 +38,20 @@ class ManagedMediaModule(private val context: ReactApplicationContext) : ReactCo
   @ReactMethod fun createId(promise: Promise) { promise.resolve(UUID.randomUUID().toString()) }
   @ReactMethod fun cancel(id: String) { jobs[id]?.set(true) }
   @ReactMethod fun freeBytes(promise: Promise) { promise.resolve(context.filesDir.usableSpace.toDouble()) }
+  @ReactMethod fun reconcile(ownedPathsJson: String, promise: Promise) = task(UUID.randomUUID().toString(), promise) { _ ->
+    val paths = JSONArray(ownedPathsJson)
+    val owned = (0 until paths.length()).map { checked(paths.getString(it)).canonicalPath }.toSet()
+    for (name in listOf("temp", "audio", "artwork")) {
+      val folder = File(root, name)
+      folder.listFiles()?.forEach { candidate ->
+        val file = checked(candidate.path)
+        if (file.isFile && (name == "temp" || file.canonicalPath !in owned)) {
+          require(file.delete()) { "PERMISSION_DENIED" }
+        }
+      }
+    }
+    null
+  }
   @ReactMethod fun stage(id: String, uri: String, maxBytes: Double, promise: Promise) = task(id, promise) { cancelled ->
     require(maxBytes > 0 && maxBytes <= 1024L * 1024 * 1024) { "IMPORT_NO_SPACE" }
     val folder = File(root, "temp").apply { mkdirs() }

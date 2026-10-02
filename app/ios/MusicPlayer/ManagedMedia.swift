@@ -42,6 +42,24 @@ final class ManagedMedia: NSObject {
     do { let values = try files.attributesOfFileSystem(forPath: NSHomeDirectory()); resolve((values[.systemFreeSize] as? NSNumber)?.doubleValue ?? 0) }
     catch { failure(error, reject) }
   }
+  @objc func reconcile(_ ownedPathsJson: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    DispatchQueue.global(qos: .utility).async {
+      do {
+        guard let data = ownedPathsJson.data(using: .utf8), let paths = try JSONSerialization.jsonObject(with: data) as? [String] else { throw MediaError.code("PERMISSION_DENIED") }
+        let owned = Set(try paths.map { try self.checked($0).path })
+        for name in ["temp", "audio", "artwork"] {
+          let folder = try self.folder(name)
+          for candidate in try self.files.contentsOfDirectory(at: folder, includingPropertiesForKeys: [.isRegularFileKey]) {
+            let url = try self.checked(candidate.absoluteString)
+            if try url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true && (name == "temp" || !owned.contains(url.path)) {
+              try self.files.removeItem(at: url)
+            }
+          }
+        }
+        resolve(nil)
+      } catch { self.failure(error, reject) }
+    }
+  }
   @objc func stage(_ id: String, uri: String, maxBytes: Double, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.global(qos: .utility).async {
       defer { self.finish(id) }

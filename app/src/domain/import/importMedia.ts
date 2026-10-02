@@ -1,4 +1,4 @@
-import type {ManagedFilesystem, MediaImporter} from './index';
+import type {ImportJournal, ManagedFilesystem, MediaImporter} from './index';
 import type {TrackRepository, TrackSource} from '../track';
 import {classifyLanguage, normalizeSearch} from '../track/normalize';
 import {AppError} from '../../shared/errors';
@@ -10,6 +10,7 @@ export class ImportMedia implements MediaImporter {
     private readonly tracks: TrackRepository,
     private readonly createId: () => Promise<string>,
     private readonly maxBytes: () => number,
+    private readonly journal?: ImportJournal,
   ) {}
   import(uri: string, source: TrackSource, signal: AbortSignal) {
     const work = () => this.execute(uri, source, signal);
@@ -20,6 +21,10 @@ export class ImportMedia implements MediaImporter {
   private async execute(uri: string, source: TrackSource, signal: AbortSignal) {
     let staged: string | null = null;
     let promoted: string | null = null;
+    let artwork: string | null = null;
+    let committed = false;
+    const jobId = await this.createId();
+    await this.journal?.begin(jobId, source);
     try {
       if (signal.aborted) {
         throw new Error('Cancelled');
@@ -29,21 +34,33 @@ export class ImportMedia implements MediaImporter {
       }
       staged = await this.files.stage(uri, this.maxBytes(), signal);
       const media = await this.files.inspect(staged, signal);
+      artwork = media.artworkPath;
+      await this.journal?.inspected(jobId, staged, media.sha256);
+      if (signal.aborted) {
+        throw new Error('Cancelled');
+      }
       const existing = await this.tracks.findByHash(media.sha256);
       if (existing) {
+        // Artwork is hash-addressed and may already belong to the original track.
+        artwork = null;
         await this.tracks.addSource(existing.id, source);
+        committed = true;
+        await this.journal?.finish(jobId, existing.id, null);
         return {track: existing, duplicate: true};
       }
       const classification = classifyLanguage({
         text: `${media.title} ${media.artist}`,
         ...(media.metadataLanguage ? {metadataLanguage: media.metadataLanguage} : {}),
       });
-      const id = await this.createId();
+      const id = jobId;
       if (signal.aborted) {
         throw new Error('Cancelled');
       }
       promoted = await this.files.promote(staged, media.sha256, media.extension);
       staged = null;
+      if (signal.aborted) {
+        throw new Error('Cancelled');
+      }
       const title = media.title.trim() || source.originalFilename.replace(/\.[^.]+$/, '');
       const track = {
         id,
@@ -66,14 +83,33 @@ export class ImportMedia implements MediaImporter {
         createdAt: Date.now(),
       };
       await this.tracks.save(track, source);
+      committed = true;
       promoted = null;
+      artwork = null;
+      await this.journal?.finish(jobId, track.id, null);
       return {track, duplicate: false};
+    } catch (error) {
+      if (!committed) {
+        await this.journal?.finish(
+          jobId,
+          null,
+          signal.aborted
+            ? 'CANCELLED'
+            : error instanceof AppError
+              ? error.code
+              : 'IMPORT_CORRUPT_FILE',
+        );
+      }
+      throw error;
     } finally {
       if (staged) {
         await this.files.remove(staged);
       }
       if (promoted) {
         await this.files.remove(promoted);
+      }
+      if (artwork) {
+        await this.files.remove(artwork);
       }
     }
   }

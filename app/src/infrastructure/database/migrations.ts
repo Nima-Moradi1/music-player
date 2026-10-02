@@ -43,6 +43,10 @@ export const migrations = [
       `CREATE TABLE provider_cache (key TEXT PRIMARY KEY, provider TEXT NOT NULL, json TEXT NOT NULL, expires_at INTEGER NOT NULL)`,
     ],
   },
+  {
+    version: 2,
+    statements: ['ALTER TABLE import_items ADD COLUMN content_hash TEXT'],
+  },
 ] as const;
 
 export async function migrate(database: Database): Promise<void> {

@@ -23,6 +23,7 @@ describe('managed import transaction', () => {
       }),
       promote: jest.fn().mockResolvedValue('managed'),
       remove: jest.fn().mockResolvedValue(undefined),
+      reconcile: jest.fn().mockResolvedValue(undefined),
       freeBytes: jest.fn().mockResolvedValue(1e9),
     };
     const tracks: jest.Mocked<TrackRepository> = {

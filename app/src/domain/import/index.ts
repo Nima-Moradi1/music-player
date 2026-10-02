@@ -73,6 +73,8 @@ export interface ManagedFilesystem {
   promote(path: string, hash: string, extension: string): Promise<string>;
   remove(path: string): Promise<void>;
   freeBytes(): Promise<number>;
+  /** Cold boot only: delete temp and unreferenced managed files. */
+  reconcile(ownedPaths: string[]): Promise<void>;
 }
 export interface MediaImporter {
   import(
@@ -80,4 +82,10 @@ export interface MediaImporter {
     source: TrackSource,
     signal: AbortSignal,
   ): Promise<{track: Track; duplicate: boolean}>;
+}
+
+export interface ImportJournal {
+  begin(id: string, source: TrackSource): Promise<void>;
+  inspected(id: string, path: string, hash: string): Promise<void>;
+  finish(id: string, trackId: string | null, errorCode: string | null): Promise<void>;
 }

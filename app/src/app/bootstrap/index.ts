@@ -6,6 +6,7 @@ import {SqlitePlaylistRepository} from '../../infrastructure/database/playlistRe
 import {NativeManagedFilesystem} from '../../infrastructure/filesystem/managedFilesystem';
 import {selectAudioFiles} from '../../infrastructure/filesystem/filePicker';
 import {managedMediaNative} from '../../native/ManagedMedia';
+import {SqliteImportJournal} from '../../infrastructure/database/importJournal';
 import {ImportMedia} from '../../domain/import/importMedia';
 import {initializeI18n} from '../../shared/i18n';
 import {createAppState, type Services} from '../providers/Services';
@@ -30,6 +31,9 @@ async function initialize(): Promise<Services> {
     const tracks = new SqliteTrackRepository(database);
     const bridge = managedMediaNative();
     const state = createAppState(settings);
+    const files = new NativeManagedFilesystem(bridge);
+    const journal = new SqliteImportJournal(database);
+    await journal.recover(files);
     return {
       tracks,
       playlists: new SqlitePlaylistRepository(database),
@@ -39,10 +43,11 @@ async function initialize(): Promise<Services> {
       createId: () => bridge.createId(),
       selectFiles: selectAudioFiles,
       importer: new ImportMedia(
-        new NativeManagedFilesystem(bridge),
+        files,
         tracks,
         () => bridge.createId(),
         () => state.getState().settings.maxImportBytes,
+        journal,
       ),
     };
   } catch (error) {

@@ -73,6 +73,9 @@ export class NativeManagedFilesystem implements ManagedFilesystem {
   remove(path: string): Promise<void> {
     return this.bridge.remove(path);
   }
+  reconcile(ownedPaths: string[]): Promise<void> {
+    return this.bridge.reconcile(JSON.stringify(ownedPaths));
+  }
   freeBytes(): Promise<number> {
     return this.bridge.freeBytes();
   }
