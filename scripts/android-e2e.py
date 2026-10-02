@@ -27,10 +27,25 @@ class Device:
 
     def tree(self):
         # A file dump avoids /dev/tty output truncation on newer Android versions.
-        self.run('shell', 'uiautomator', 'dump', '/sdcard/music-player-ui.xml')
-        xml = self.run('exec-out', 'cat', '/sdcard/music-player-ui.xml')
-        (self.artifacts / 'last-ui.xml').write_text(xml)
-        return ET.fromstring(xml)
+        for _ in range(3):
+            self.run('shell', 'uiautomator', 'dump', '/sdcard/music-player-ui.xml')
+            xml = self.run('exec-out', 'cat', '/sdcard/music-player-ui.xml')
+            (self.artifacts / 'last-ui.xml').write_text(xml)
+            root = ET.fromstring(xml)
+            launcher_anr = any(
+                node.get('package') == 'android'
+                and node.get('text', '').endswith("Launcher isn't responding")
+                for node in root.iter('node')
+            )
+            if launcher_anr:
+                wait = self.find(root, 'Wait')
+                if wait is not None:
+                    print('RECOVER Pixel Launcher ANR dialog', flush=True)
+                    self.tap_node(wait)
+                    time.sleep(0.5)
+                    continue
+            return root
+        return root
 
     @staticmethod
     def bounds(node):

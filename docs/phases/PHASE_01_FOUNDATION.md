@@ -80,7 +80,7 @@ Acceptance:
 
 Tests:
 
-- Contrast/component tests and emulator themes/locales/switches pass. Native haptic wiring exists. iPhone 18 Pro/iOS 27 XCTest audits of Home, Library and Settings pass for hit regions, element descriptions and clipped text after replacing the placeholder app title. The same audit passed at `accessibility-medium` Dynamic Type size on 2026-10-02. Larger sizes and screen-reader traversal remain pending.
+- Contrast/component tests and emulator themes/locales/switches pass. Native haptic wiring exists. iPhone 18 Pro/iOS 27 XCTest audits of Home, Library and Settings pass for hit regions, element descriptions and clipped text after replacing the placeholder app title. The same audit passed at `accessibility-medium` Dynamic Type size on 2026-10-02. Theme/language controls now expose selected state; Persian settings and Home accessibility audits plus relaunch persistence pass. Larger sizes and screen-reader traversal remain pending.
 
 ### P1-T07 — Durable local data
 
@@ -158,7 +158,7 @@ Acceptance:
 
 Tests:
 
-- Java 21/SDK 37; x86_64 API 36.0 emulator. Earlier debug build/three native tests passed. Latest committed CI run 37028018129 failed at a Kotlin haptics activity reference; source now uses `reactApplicationContext.currentActivity`. Local Gradle cannot fetch Google's SDK manifests; an isolated SDK 36/NDK 28 mirror attempt reached native module configuration but was stopped before Kotlin after prolonged configuration. Project build inputs were restored; fresh pinned native build/E2E remain required.
+- Java 21/SDK 37; x86_64 API 36.0 emulator. Feature CI run 37046205237 passed `assembleDebug testDebugUnitTest` after the Kotlin haptics fix. Emulator E2E stopped before its first app action because a system Pixel Launcher ANR dialog covered the running onboarding screen. The harness now handles that dialog, pending CI rerun. Local Gradle cannot fetch Google's SDK manifests; an isolated SDK 36/NDK 28 mirror attempt reached native module configuration but was stopped before Kotlin after prolonged configuration. Project build inputs were restored.
 
 ### P1-T13 — iOS build and boot
 

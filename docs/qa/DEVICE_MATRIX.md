@@ -10,7 +10,7 @@ Legend: pending means the behavior is not verified. Component tests supplement d
 | Corrupt, executable, zero/large file rejection | partial invalid   | pending          | pending              | pending      |
 | Duplicate content / provenance                 | PASS              | pending          | pending              | pending      |
 | Favorites / playlists / restart persistence    | partial persisted | pending          | pending              | pending      |
-| Dark/light / Persian RTL                       | PASS              | pending          | pending              | pending      |
+| Dark/light / Persian RTL                       | PASS              | pending          | partial Persian      | pending      |
 | Dynamic Type / small screens / landscape       | pending           | pending          | partial Dynamic Type | pending      |
 | TalkBack / VoiceOver traversal and controls    | pending           | pending          | audit pass           | pending      |
 | Reduce motion / solid surfaces                 | PASS controls     | pending          | pending              | pending      |
@@ -25,6 +25,8 @@ Screenshots and visible UI hierarchy were inspected under ignored `artifacts/qa/
 On 2026-10-02, `FoundationUITests.testAccessibleHomeLibraryAndSettings` passed XCTest audits for hit regions, sufficient element descriptions and clipped text on Home, Library and Settings. It exposed the placeholder `APP_NAME` Home label; English and Persian now show readable app names. This audit does not replace VoiceOver traversal.
 
 On 2026-10-02, the same XCTest accessibility audit passed with the iPhone 18 Pro simulator set to `accessibility-medium` Dynamic Type size (one test, zero failures). The simulator setting was restored to `large`. Evidence: ignored `artifacts/qa/ios-large-text-test.log`. Small screens, landscape and larger accessibility sizes remain pending.
+
+On 2026-10-02, an iPhone 18 Pro/iOS 27 UI test passed switching to Persian and dark theme, checking accessible selected states, relaunch persistence, and Home/Settings accessibility audits in Persian. The test restored English and system theme. Evidence: ignored `artifacts/qa/ios-persian-settings-test.log`. Full VoiceOver traversal remains pending.
 
 Manual Android import used a self-generated two-second 440 Hz sine MP3 (32,600 bytes). System picker import produced one managed SHA-256 filename and one track with 2,038 ms native duration. Importing identical bytes under another filename kept the library at 10,001 tracks and one physical media file, preserving two provenance rows. A fake MP3 containing 50 plain-text bytes was rejected with a visible supported-file message and left no temp/extra audio file. No downloaded or copyrighted music was used.
 

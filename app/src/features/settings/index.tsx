@@ -57,6 +57,7 @@ export function SettingsScreen() {
             key={theme}
             label={t(theme)}
             secondary={settings.theme !== theme}
+            selected={settings.theme === theme}
             onPress={() => {
               void updateSettings(services, {theme});
             }}
@@ -68,6 +69,7 @@ export function SettingsScreen() {
         <Button
           label="English"
           secondary={settings.locale !== 'en'}
+          selected={settings.locale === 'en'}
           onPress={() => {
             void updateSettings(services, {locale: 'en'});
           }}
@@ -75,6 +77,7 @@ export function SettingsScreen() {
         <Button
           label="فارسی"
           secondary={settings.locale !== 'fa'}
+          selected={settings.locale === 'fa'}
           onPress={() => {
             void updateSettings(services, {locale: 'fa'});
           }}
