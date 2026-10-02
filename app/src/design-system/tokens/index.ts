@@ -32,6 +32,7 @@ export const tokens = {
     spring: {damping: 22, stiffness: 220},
   },
   opacity: {disabled: 0.45, muted: 0.65},
+  feedback: {toastDuration: 6000, overlay: 'rgba(0,0,0,0.55)', skeletonLines: 3},
   blur: {subtle: 8, standard: 16, elevated: 24},
   elevation: {card: 2, sheet: 8},
   surface: {border: 1},

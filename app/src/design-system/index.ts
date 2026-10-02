@@ -16,3 +16,5 @@ export {
 export {Icon, type IconName} from './icons';
 export {Artwork} from './components/Artwork';
 export {TrackRow} from './components/TrackRow';
+export {Sheet, Dialog, Toast, Skeleton} from './components/Feedback';
+export {useHaptics} from './haptics';

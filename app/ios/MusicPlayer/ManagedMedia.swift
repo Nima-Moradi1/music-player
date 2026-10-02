@@ -4,6 +4,7 @@ import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 import React
+import UIKit
 
 @objc(ManagedMedia)
 final class ManagedMedia: NSObject {
@@ -163,3 +164,18 @@ final class ManagedMedia: NSObject {
 }
 private enum MediaError: Error { case code(String) }
 
+
+@objc(Haptics)
+final class Haptics: NSObject {
+  @objc static func requiresMainQueueSetup() -> Bool { false }
+  @objc func feedback(_ kind: String) {
+    DispatchQueue.main.async {
+      switch kind {
+      case "selection": UISelectionFeedbackGenerator().selectionChanged()
+      case "success": UINotificationFeedbackGenerator().notificationOccurred(.success)
+      case "error": UINotificationFeedbackGenerator().notificationOccurred(.error)
+      default: break
+      }
+    }
+  }
+}

@@ -16,16 +16,15 @@ import {tokens} from '../tokens';
 import {useTheme} from '../theme';
 import {Icon, type IconName} from '../icons';
 type TextKind = 'body' | 'caption' | 'label' | 'title' | 'heading' | 'display';
-export function Text({
-  kind = 'body',
-  muted = false,
-  style,
-  ...props
-}: TextProps & {kind?: TextKind; muted?: boolean}) {
+export const Text = React.forwardRef<
+  React.ElementRef<typeof NativeText>,
+  TextProps & {kind?: TextKind; muted?: boolean}
+>(function ThemedText({kind = 'body', muted = false, style, ...props}, ref) {
   const {colors, rtl} = useTheme();
   return (
     <NativeText
       {...props}
+      ref={ref}
       style={[
         {
           color: muted ? colors.muted : colors.text,
@@ -38,7 +37,7 @@ export function Text({
       ]}
     />
   );
-}
+});
 export function Surface({
   children,
   variant = 'standard',
@@ -105,6 +104,7 @@ export function Button({
   icon,
   secondary = false,
   disabled = false,
+  selected,
   testID,
 }: {
   label: string;
@@ -112,6 +112,7 @@ export function Button({
   icon?: IconName;
   secondary?: boolean;
   disabled?: boolean;
+  selected?: boolean;
   testID?: string;
 }) {
   const {colors, rtl} = useTheme();
@@ -119,7 +120,7 @@ export function Button({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
-      accessibilityState={{disabled}}
+      accessibilityState={{disabled, ...(selected === undefined ? {} : {selected})}}
       disabled={disabled}
       onPress={onPress}
       testID={testID}

@@ -11,3 +11,7 @@ RCT_EXTERN_METHOD(promote:(NSString *)path hash:(NSString *)hash ext:(NSString *
 RCT_EXTERN_METHOD(remove:(NSString *)path resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 @end
 
+
+@interface RCT_EXTERN_MODULE(Haptics, NSObject)
+RCT_EXTERN_METHOD(feedback:(NSString *)kind)
+@end

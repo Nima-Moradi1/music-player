@@ -4,6 +4,7 @@ import android.media.MediaMetadataRetriever
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.view.HapticFeedbackConstants
 import com.facebook.react.bridge.*
 import com.facebook.react.ReactPackage
 import com.facebook.react.uimanager.ViewManager
@@ -144,6 +145,19 @@ class ManagedMediaModule(private val context: ReactApplicationContext) : ReactCo
 }
 
 class ManagedMediaPackage : ReactPackage {
-  override fun createNativeModules(context: ReactApplicationContext): List<NativeModule> = listOf(ManagedMediaModule(context))
+  override fun createNativeModules(context: ReactApplicationContext): List<NativeModule> = listOf(ManagedMediaModule(context), HapticsModule(context))
   override fun createViewManagers(context: ReactApplicationContext): List<ViewManager<*, *>> = emptyList()
+}
+
+class HapticsModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {
+  override fun getName() = "Haptics"
+  @ReactMethod fun feedback(kind: String) {
+    val constant = when (kind) {
+      "selection" -> HapticFeedbackConstants.CLOCK_TICK
+      "success" -> if (android.os.Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.VIRTUAL_KEY
+      "error" -> if (android.os.Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.LONG_PRESS
+      else -> return
+    }
+    currentActivity?.runOnUiThread { currentActivity?.window?.decorView?.performHapticFeedback(constant) }
+  }
 }
