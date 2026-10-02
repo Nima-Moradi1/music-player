@@ -1,13 +1,11 @@
 # Recovery requirements
 
-Implemented: transactional schema creation, rejection of newer schemas, database close on failed bootstrap, compensating removal on failed import commit, duplicate content/provenance handling and cancellation cleanup. Integration tests use real SQLite; file-transaction tests use explicit native-port doubles.
+Implemented: transactional schema creation, rejection of newer schemas, database close on failed bootstrap, compensating removal on failed import commit, duplicate content/provenance handling, cancellation cleanup, import journaling and cold-boot reconciliation. Integration tests use real SQLite; file-transaction tests use explicit native-port doubles. Recovery preserves committed audio/artwork ownership and deletes orphan temp or promoted files before imports resume.
 
 Remaining Phase 1 gates:
 
-- Journal each managed import before staging/promotion and reconcile unfinished imports on cold boot.
-- Clean orphan temp files after a crash without deleting referenced media.
-- Recover safely from a crash between atomic file promotion and database commit.
-- Extract embedded artwork/lyrics with bounded native decoding.
+- Verify journal/reconciliation on both native platforms during forced process death and storage failures.
+- Extract embedded lyrics with bounded native decoding; embedded artwork is implemented.
 - Exercise storage exhaustion and malformed media on both native platforms.
 - Verify native module serialization and cancellation under rapid import/background transitions.
 

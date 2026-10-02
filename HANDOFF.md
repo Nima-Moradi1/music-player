@@ -1,8 +1,8 @@
 ﻿# HANDOFF
 
-Updated: 2026-09-29 13:39 UTC
+Updated: 2026-10-02 21:44 Asia/Tehran
 Phase: 1 — Foundation, architecture, design system, local library
-Branch: main
+Branch: feature/phase-01-foundation-gates
 Last commit: see `git log -1`
 Status: PARTIAL
 
@@ -11,8 +11,8 @@ Status: PARTIAL
 - Bare RN 0.87.1 / React 19.2.3, Hermes/New Architecture, pnpm workspace.
 - Public repository: https://github.com/Nima-Moradi1/music-player.
 - Offline shell, SQLite library, native managed imports and MMKV preferences implemented.
-- Android/iOS debug build and boot verified; JavaScript/native CI pass at `b637fac`.
-- Phase 1 exit is open; Phases 2–5 have not started.
+- Android/iOS debug build and boot previously verified; fresh local JavaScript suite passes at current working tree.
+- Phase 1 exit is open; Phases 2–5 have not started. Existing work is preserved in coherent feature commits on this branch.
 
 ## What changed
 
@@ -22,10 +22,15 @@ Status: PARTIAL
 - DONE `.github/workflows/quality.yml` — JavaScript, Android and macOS native build lanes.
 - DONE navigation hook error, API 24 file reads, Metro namespace transform and switch touch targets.
 - DONE native 10k diagnostics/search optimization — emulator search p95 reduced from 153 ms to 48 ms.
+- DONE journal/cold-boot recovery, orphan reconciliation and bounded embedded artwork in commits after the previous handoff.
+- DONE 2026-10-02 local Node 23 SQLite test adapter fix; 43 tests/16 suites, typecheck and format pass.
+- IN PROGRESS Android CI regression: run 37028018129 fails compiling the new haptics module at `currentActivity`; local activity-reference fix is awaiting a fresh native build.
+- DONE 2026-10-02 iOS Xcode 27 Debug build/scene launch and complete simulator smoke script, including a passing UI test through onboarding, Library and Settings; smoke now checks process survival.
+- DONE iOS 27 accessibility audit for Home/Library/Settings after replacing `APP_NAME` with localized readable names.
 
 ## Decisions
 
-- Follow supplied phase gates and first-session restriction: no Telegram or DSP implementation yet.
+- Follow supplied phase gates: Telegram and DSP remain gated by Phase 1 exit.
 - Keep branding replaceable; no backend, account or telemetry.
 - Managed-file native bridge uses New Architecture interoperability; see ADR-002.
 - Selected-track preview opens details; it never claims playback. Fixtures contain no audio.
@@ -38,21 +43,22 @@ Status: PARTIAL
 
 ## Remaining work
 
-- TODO finish sheets/dialogs/toasts/skeleton primitives, haptics and comprehensive accessibility baseline.
-- TODO import journal/cold-boot recovery, orphan cleanup, embedded assets and native media matrix.
-- TODO complete automated native E2E, large-font/small-screen/landscape/TalkBack/VoiceOver checks.
-- TODO reference-device performance and iOS interactions beyond onboarding.
+- TODO comprehensive accessibility baseline including screen-reader and adaptive layouts; feedback primitives and haptic wiring are implemented.
+- TODO native media/storage/cancellation matrix and embedded lyrics; import journal/reconciliation and bounded artwork are implemented.
+- TODO complete Android native E2E, large-font/small-screen/landscape/TalkBack/VoiceOver checks.
+- TODO reference-device performance and deeper iOS import/interruption interactions.
 
 ## Blockers
 
 - BLOCKER-P1-DEVICE — physical iOS/Android devices unavailable here; simulator checks continue independently.
+- BLOCKER-P1-ANDROID-LOCAL — Google's SDK repository manifests return 404; a temporary SDK 36/NDK 28 mirror attempt reached native configuration but did not reach app Kotlin. Original build.gradle and ignored local.properties were restored/removed. Pinned CI build is the next verification path.
 
 ## Next steps
 
-1. Verify the latest main workflow and preserve the build/boot evidence below.
-2. Implement and test import journaling/reconciliation before declaring crash-safe import done.
-3. Close the remaining design/accessibility and native media/E2E matrix in Phase 1.
-4. Only after its exit gate passes, start the Phase 2 native audio engine.
+1. Run the pending Android Kotlin/native E2E build with pinned SDK inputs in CI; inspect the `reactApplicationContext.currentActivity` fix and Android E2E result.
+2. Close the remaining accessibility and native media/storage/E2E matrix in Phase 1; journal/reconciliation and bounded artwork are implemented.
+3. Extend iOS simulator import interactions and verify screen-reader/large-font behavior on native devices.
+4. Only after the Phase 1 exit gate passes, start the Phase 2 native audio engine.
 
 ## Important files
 
@@ -68,11 +74,14 @@ Status: PARTIAL
 ## Verification
 
 - PASS `pnpm typecheck`; `pnpm lint` — no errors, eight dynamic-style warnings.
-- PASS `pnpm test` — 24 tests in 10 suites.
+- PASS `pnpm test` — 43 tests in 16 suites on 2026-10-02.
 - PASS `pnpm format:check`; `git diff --check`.
 - PASS `./scripts/android-windows.ps1 -JavaHome '<JDK21>' -AndroidSdk '<SDK>'` — debug build/three native tests.
 - PASS `pnpm --filter @music-player/app exec react-native bundle --platform android --dev false --entry-file index.js --bundle-output ../artifacts/index.android.bundle --assets-dest ../artifacts/android --max-workers 2`.
 - PASS Android: onboarding/tabs/themes/EN/FA/10k rows/favorites/details, MP3 import/hash dedupe, persisted playlist rename.
-- PASS iOS simulator boot: onboarding screenshot/logs reviewed in `ios-simulator-smoke` artifact.
-- PASS native build/boot CI: https://github.com/Nima-Moradi1/music-player/actions/runs/36572421544.
-- PENDING full native import/recovery and accessibility/device matrix.
+- HISTORICAL PASS iOS simulator boot: onboarding screenshot/logs reviewed in `ios-simulator-smoke` artifact.
+- PASS 2026-10-02 local iPhone 18 Pro/iOS 27 Debug build and `FoundationUITests.testOnboardingLibraryAndSettings`; screenshot confirms onboarding after UIScene migration.
+- HISTORICAL PASS native build/boot CI: https://github.com/Nima-Moradi1/music-player/actions/runs/36572421544. Latest committed run 37028018129 failed Android compile and a playlist test; the local working tree contains fixes awaiting native/CI verification.
+- PASS complete local `ios-simulator-smoke.sh` with Xcode 27: app process survived and navigation UI test passed; the script runs the full UI scheme in CI.
+- PASS full Foundation UI scheme: navigation and iOS 27 accessibility audit, two tests, zero failures.
+- PENDING Android current-source build/E2E, full native import/recovery and accessibility/device matrix. Local SDK manifests (`repository2-3.xml`/`repository2-4.xml`) returned 404; ignored mirror/substitution attempt did not reach app Kotlin and left project inputs unchanged.

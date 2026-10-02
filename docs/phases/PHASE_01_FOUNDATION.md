@@ -54,7 +54,7 @@ Acceptance:
 
 Tests:
 
-- JavaScript checks pass; eight dynamic-style lint warnings documented.
+- 2026-10-02 local Node 23: 43 tests/16 suites, typecheck, format and lint pass; eight dynamic-style lint warnings documented. The test SQLite adapter now handles Node 22/23 without `statement.columns()`.
 
 ### P1-T05 — Domain contracts
 
@@ -76,11 +76,11 @@ Depends: P1-T04, P1-T05
 Files: app/src/design-system/, shared/i18n.ts
 Acceptance:
 
-- Tokens, dark/light/EN/FA/RTL, scalable text, 48dp controls, fallbacks. Finish sheets/dialogs/toasts/skeletons/haptics.
+- Tokens, dark/light/EN/FA/RTL, scalable text, 48dp controls, fallbacks, sheets/dialogs/toasts/skeletons/haptics.
 
 Tests:
 
-- Contrast/component tests and emulator themes/locales/switches pass. Font/screen-reader matrix pending.
+- Contrast/component tests and emulator themes/locales/switches pass. Native haptic wiring exists. iPhone 18 Pro/iOS 27 XCTest audits of Home, Library and Settings pass for hit regions, element descriptions and clipped text after replacing the placeholder app title. Font/screen-reader matrix pending.
 
 ### P1-T07 — Durable local data
 
@@ -102,11 +102,11 @@ Depends: P1-T07
 Files: domain/import/, native/ManagedMedia.ts, infrastructure/filesystem/, Kotlin/Swift modules
 Acceptance:
 
-- Bounded native stage/metadata/SHA-256, validation/hash identity, atomic promotion, cancellation/compensation. Journal crashes and extract embedded assets.
+- Bounded native stage/metadata/SHA-256, validation/hash identity, atomic promotion, cancellation/compensation, journal recovery and bounded embedded artwork. Embedded lyrics and native failure matrix remain open.
 
 Tests:
 
-- Import/late-cancel tests and three Kotlin safety tests pass. Both-platform real-file/malformed/storage matrix pending.
+- Import/late-cancel and SQLite journal recovery tests pass; three Kotlin safety tests passed previously. Both-platform real-file/malformed/storage matrix pending.
 
 ### P1-T09 — Offline application shell
 
@@ -149,7 +149,7 @@ Tests:
 
 ### P1-T12 — Android build and boot
 
-Status: DONE
+Status: IN PROGRESS
 Depends: P1-T03, P1-T04
 Files: scripts/android-windows.ps1, Android project, docs/release/ANDROID.md
 Acceptance:
@@ -158,7 +158,7 @@ Acceptance:
 
 Tests:
 
-- Java 21/SDK 37; x86_64 API 36.0 emulator. Debug build/three native tests and Android CI pass.
+- Java 21/SDK 37; x86_64 API 36.0 emulator. Earlier debug build/three native tests passed. Latest committed CI run 37028018129 failed at a Kotlin haptics activity reference; source now uses `reactApplicationContext.currentActivity`. Local Gradle cannot fetch Google's SDK manifests; an isolated SDK 36/NDK 28 mirror attempt reached native module configuration but was stopped before Kotlin after prolonged configuration. Project build inputs were restored; fresh pinned native build/E2E remain required.
 
 ### P1-T13 — iOS build and boot
 
@@ -171,7 +171,7 @@ Acceptance:
 
 Tests:
 
-- Native simulator build/boot pass at b637fac. Onboarding screenshot/logs reviewed; physical iOS access external.
+- Native simulator build/boot passed at b637fac. On 2026-10-02, Xcode 27 exposed a generated Pod resource bundle at iOS 12.4 and mandatory scene lifecycle. Podfile now raises old generated targets to the RN minimum 15.1; app adopts UIScene. Fresh Debug build and the complete `ios-simulator-smoke.sh` path pass on iPhone 18 Pro/iOS 27. The full Foundation UI scheme passes navigation and accessibility audits (two tests, zero failures). Physical iOS access remains external.
 
 ### P1-T14 — Design, performance and device gate
 
@@ -184,4 +184,4 @@ Acceptance:
 
 Tests:
 
-- Desktop SQLite/Android fixture smoke pass; detailed device/accessibility evidence remains open.
+- Desktop SQLite/Android fixture smoke and iOS simulator navigation/accessibility audits pass; Android current-source, screen-reader and physical-device evidence remain open.

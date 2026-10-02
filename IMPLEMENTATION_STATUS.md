@@ -7,17 +7,17 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [x] P1-T01 Repository structure, contract, phase docs, ADR-001, privacy/security.
 - [x] P1-T02 Public GitHub repository and isolated feature commits.
 - [x] P1-T03 RN 0.87.1 New Architecture Android/iOS project.
-- [x] P1-T04 Strict TypeScript, lint, formatting, unit/component CI; JavaScript lane passes.
+- [x] P1-T04 Strict TypeScript, lint, formatting, unit/component CI; local Node 23 test adapter repaired and 43 tests pass (2026-10-02).
 - [x] P1-T05 Domain contracts and stable errors.
-- [~] P1-T06 Tokens, accessible components, light/dark, EN/FA, RTL, motion/transparency fallbacks.
+- [~] P1-T06 Tokens, sheets/dialogs/toasts/skeletons, native haptics, light/dark, EN/FA, RTL, motion/transparency fallbacks; iOS 27 accessibility audit passes, screen-reader/device matrix pending.
 - [x] P1-T07 SQLite adapter, transactional migrations, repositories and settings migrations.
-- [~] P1-T08 Managed files, native metadata/streaming SHA-256, atomic import and dedupe.
+- [~] P1-T08 Managed files, native metadata/streaming SHA-256, atomic import/dedupe, journal/recovery and bounded embedded artwork; native failure matrix pending.
 - [~] P1-T09 Onboarding, Home, Library and all browse dimensions.
 - [~] P1-T10 Search, favorites, playlists CRUD, sorting/filtering.
 - [~] P1-T11 Manual import, 10k fixture, diagnostics, mini-player placeholder.
-- [x] P1-T12 Android debug build, native tests and emulator boot/navigation.
-- [x] P1-T13 iOS debug build and simulator boot in macOS CI; onboarding screenshot/logs reviewed.
-- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates.
+- [~] P1-T12 Earlier Android debug build/native tests/emulator boot passed; latest committed CI has a Kotlin haptics compile regression, locally patched and awaiting rebuild.
+- [x] P1-T13 iOS Debug build, iOS 27 simulator boot and two native UI tests pass after Pod target and scene-lifecycle fixes (2026-10-02).
+- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates; 43 JS tests and iOS simulator navigation/accessibility audits pass, Android current-source and screen-reader evidence pending.
 
 Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/PHASE_01_FOUNDATION.md` and `docs/qa/`. Later phases remain gated by its exit; the first-session contract also prohibits Telegram/DSP work.
 
