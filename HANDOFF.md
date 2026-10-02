@@ -28,6 +28,7 @@ Status: PARTIAL
 - IN PROGRESS Android CI regression: run 37028018129 fails compiling the new haptics module at `currentActivity`; local activity-reference fix is awaiting a fresh native build.
 - DONE 2026-10-02 iOS Xcode 27 Debug build/scene launch and complete simulator smoke script, including a passing UI test through onboarding, Library and Settings; smoke now checks process survival.
 - DONE iOS 27 accessibility audit for Home/Library/Settings after replacing `APP_NAME` with localized readable names.
+- DONE iOS 27 accessibility text-size check at `accessibility-medium`: `FoundationUITests.testAccessibleHomeLibraryAndSettings` passed with zero failures; simulator content size restored to `large`.
 
 ## Decisions
 
@@ -86,4 +87,5 @@ Status: PARTIAL
 - HISTORICAL PASS native build/boot CI: https://github.com/Nima-Moradi1/music-player/actions/runs/36572421544. Latest committed run 37028018129 failed Android compile and a playlist test; the local working tree contains fixes awaiting native/CI verification.
 - PASS complete local `ios-simulator-smoke.sh` with Xcode 27: app process survived and navigation UI test passed; the script runs the full UI scheme in CI.
 - PASS full Foundation UI scheme: navigation and iOS 27 accessibility audit, two tests, zero failures.
+- PASS iOS 27 simulator at `accessibility-medium` content size: Home/Library/Settings accessibility audit, one test, zero failures (`artifacts/qa/ios-large-text-test.log`).
 - PENDING Android current-source build/E2E, full native import/recovery and accessibility/device matrix. Local SDK manifests (`repository2-3.xml`/`repository2-4.xml`) returned 404; ignored mirror/substitution attempt did not reach app Kotlin and left project inputs unchanged.

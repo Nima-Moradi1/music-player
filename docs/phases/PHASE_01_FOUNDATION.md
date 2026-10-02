@@ -80,7 +80,7 @@ Acceptance:
 
 Tests:
 
-- Contrast/component tests and emulator themes/locales/switches pass. Native haptic wiring exists. iPhone 18 Pro/iOS 27 XCTest audits of Home, Library and Settings pass for hit regions, element descriptions and clipped text after replacing the placeholder app title. Font/screen-reader matrix pending.
+- Contrast/component tests and emulator themes/locales/switches pass. Native haptic wiring exists. iPhone 18 Pro/iOS 27 XCTest audits of Home, Library and Settings pass for hit regions, element descriptions and clipped text after replacing the placeholder app title. The same audit passed at `accessibility-medium` Dynamic Type size on 2026-10-02. Larger sizes and screen-reader traversal remain pending.
 
 ### P1-T07 — Durable local data
 
