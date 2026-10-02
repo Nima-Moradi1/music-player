@@ -60,12 +60,19 @@ it('creates, renames, removes membership and confirms deletion without deleting 
   fireEvent.press(screen.getByRole('button', {name: 'Save'}));
   await screen.findByRole('header', {name: 'Favorites'});
   expect((await playlists.list())[0]?.name).toBe('Favorites');
+  await waitFor(() =>
+    expect(
+      screen.getByRole('button', {name: `Remove from playlist: ${track.title}`}),
+    ).toBeEnabled(),
+  );
   fireEvent.press(screen.getByRole('button', {name: `Remove from playlist: ${track.title}`}));
   await screen.findByText('A new home for your songs');
   expect(await playlists.tracks('playlist-1')).toEqual([]);
+  await waitFor(() => expect(screen.getByRole('button', {name: 'Delete'})).toBeEnabled());
   fireEvent.press(screen.getByRole('button', {name: 'Delete'}));
   await screen.findByRole('header', {name: 'Delete this playlist?'});
   const dialog = screen.UNSAFE_getAllByType(Modal).find(modal => modal.props.visible)!;
+  await waitFor(() => expect(within(dialog).getByRole('button', {name: 'Delete'})).toBeEnabled());
   fireEvent.press(within(dialog).getByRole('button', {name: 'Delete'}));
   await waitFor(() => expect(screen.queryByRole('header', {name: 'Favorites'})).toBeNull());
   expect(await playlists.list()).toEqual([]);

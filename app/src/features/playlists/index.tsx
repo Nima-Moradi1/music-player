@@ -150,6 +150,7 @@ export function PlaylistsScreen({header}: {header?: React.ReactElement | null}) 
       {header}
       <Button
         label={t('newPlaylist')}
+        disabled={busy}
         onPress={() => {
           setName('');
           setMutationError(false);
@@ -161,6 +162,7 @@ export function PlaylistsScreen({header}: {header?: React.ReactElement | null}) 
           <Button
             secondary
             label={t('back')}
+            disabled={busy}
             onPress={() => {
               setItems([]);
               setSelected(null);
@@ -173,6 +175,7 @@ export function PlaylistsScreen({header}: {header?: React.ReactElement | null}) 
             <Button
               secondary
               label={t('rename')}
+              disabled={busy}
               onPress={() => {
                 setName(selected.name);
                 setMutationError(false);
@@ -182,6 +185,7 @@ export function PlaylistsScreen({header}: {header?: React.ReactElement | null}) 
             <Button
               secondary
               label={t('delete')}
+              disabled={busy}
               onPress={() => {
                 setMutationError(false);
                 setDeleting(true);
@@ -262,6 +266,7 @@ export function PlaylistsScreen({header}: {header?: React.ReactElement | null}) 
               <Button
                 secondary
                 label={`${item.name} · ${item.count}`}
+                disabled={busy}
                 onPress={() => {
                   setItems([]);
                   setSelected(item);

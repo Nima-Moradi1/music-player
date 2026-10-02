@@ -20,6 +20,7 @@ it.each(Object.keys(palettes) as (keyof typeof palettes)[])(
     for (const background of [palette.background, palette.surface, palette.elevated]) {
       expect(contrast(palette.text, background)).toBeGreaterThanOrEqual(4.5);
       expect(contrast(palette.muted, background)).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(palette.danger, background)).toBeGreaterThanOrEqual(4.5);
     }
     expect(contrast(palette.onAccent, palette.accent)).toBeGreaterThanOrEqual(4.5);
   },
