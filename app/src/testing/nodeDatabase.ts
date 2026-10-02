@@ -10,7 +10,7 @@ export function nodeTestDatabase(): Database {
   const {DatabaseSync} = require('node:sqlite') as {
     DatabaseSync: new (path: string) => {
       prepare(sql: string): {
-        columns(): unknown[];
+        columns?: () => unknown[];
         all(...params: SqlValue[]): SqlRow[];
         run(...params: SqlValue[]): {changes: number | bigint};
       };
@@ -21,7 +21,12 @@ export function nodeTestDatabase(): Database {
   const session: DatabaseSession = {
     async execute(sql: string, params: SqlValue[] = []) {
       const statement = connection.prepare(sql);
-      if (statement.columns().length) {
+      // Node 22/23 expose no column metadata; all repository reads start with
+      // SELECT or WITH. Node 24+ can classify RETURNING statements directly.
+      const returnsRows = statement.columns
+        ? statement.columns().length > 0
+        : /^\s*(SELECT|WITH|PRAGMA)\b/i.test(sql);
+      if (returnsRows) {
         return {rows: statement.all(...params) as SqlRow[], rowsAffected: 0};
       }
       const result = statement.run(...params);
