@@ -30,4 +30,4 @@ app/android/.kotlin/
 *.ipa
 *.jsbundle
 .metro-health-check*
-vendor/bundle/
+**/vendor/bundle/

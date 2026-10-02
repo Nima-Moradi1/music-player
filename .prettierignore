@@ -6,3 +6,5 @@ app/android
 app/ios
 coverage
 artifacts
+app/vendor/bundle
+app/Gemfile.lock

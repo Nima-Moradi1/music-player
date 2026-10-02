@@ -6,6 +6,30 @@ Current target/scheme: `MusicPlayer`; workspace created by CocoaPods: `app/ios/M
 
 React Native's checked-in helper requires Xcode 16.1 or later; verify production App Store/Xcode requirements again at release time.
 
+Use Ruby 3.3.12 (see the root `.ruby-version`), matching the iOS CI toolchain. With Homebrew, install Ruby 3.3 and select it in each terminal before running Bundler:
+
+```sh
+brew install ruby@3.3
+export PATH="$(brew --prefix ruby@3.3)/bin:$PATH"
+ruby -v
+bundle -v
+```
+
+Ruby must report `3.3.x`. Homebrew's versioned Ruby is keg-only, so installation alone does not change the active Ruby. Add the export to your shell configuration if you want it in future terminals. If using a version manager, install and select the version in `.ruby-version` instead.
+
+macOS's system Ruby 2.6 can fail while compiling `json` with `ruby/config.h` missing. Selecting the standalone Ruby fixes the missing development headers; the Gemfile rejects the unsupported system Ruby before installation. Bundler keeps gems in `app/vendor/bundle`, which is ignored by Git.
+
+`app/Gemfile.lock` records the verified gems and Bundler version. CI reads that lockfile and installs with `BUNDLE_FROZEN=true` so dependency changes must be intentional. If your Ruby installation provides a different Bundler, install the locked version with `gem install bundler -v 4.0.16`.
+
+For CocoaPods and simulator builds, use the full Xcode developer directory in the same terminal (adjust the path if Xcode is installed elsewhere):
+
+```sh
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+xcodebuild -version
+```
+
+Then, from the repository root:
+
 ```sh
 pnpm install --frozen-lockfile --fetch-timeout=600000
 cd app

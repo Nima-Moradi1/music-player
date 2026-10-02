@@ -80,9 +80,12 @@ jobs:
       - run: pnpm install --frozen-lockfile --fetch-timeout=600000
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: '3.3.12'
+          working-directory: app
       - run: bundle install
         working-directory: app
+        env:
+          BUNDLE_FROZEN: 'true'
       - run: bundle exec pod install
         working-directory: app/ios
       - name: Simulator build
