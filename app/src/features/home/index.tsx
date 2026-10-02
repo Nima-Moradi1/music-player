@@ -7,6 +7,8 @@ import {
   Artwork,
   Button,
   IconButton,
+  EmptyState,
+  Loading,
   Page,
   Row,
   Surface,
@@ -15,7 +17,12 @@ import {
   TrackRow,
 } from '../../design-system';
 import type {RootStackParamList} from '../../app/navigation/types';
-import {useLibraryVersion, useServices, runLibraryCommand} from '../../app/providers/Services';
+import {
+  useLibraryVersion,
+  useServices,
+  runLibraryCommand,
+  refreshLibrary,
+} from '../../app/providers/Services';
 import {useTracks} from '../../app/providers/useTracks';
 import {ImportButton} from '../imports';
 export function HomeScreen() {
@@ -23,11 +30,13 @@ export function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const services = useServices();
   const version = useLibraryVersion();
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<number | null>(null);
+  const [countError, setCountError] = useState(false);
   const {width, fontScale} = useWindowDimensions();
   const recent = useTracks({sort: 'recent', limit: 5});
   useEffect(() => {
     let active = true;
+    setCountError(false);
     services.tracks
       .count()
       .then(value => {
@@ -35,7 +44,11 @@ export function HomeScreen() {
           setCount(value);
         }
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (active) {
+          setCountError(true);
+        }
+      });
     return () => {
       active = false;
     };
@@ -59,13 +72,23 @@ export function HomeScreen() {
           <Artwork seed="quiet-local-music" large />
           <View style={styles.copy}>
             <Text kind="caption">{t('localFirst')}</Text>
-            <Text kind="heading">{t('songCount', {count})}</Text>
+            <Text kind="heading">{count === null ? t('loading') : t('songCount', {count})}</Text>
             <Text muted>{t('localCaption')}</Text>
           </View>
         </Row>
       </Surface>
       <ImportButton />
-      {!!recent.items.length && (
+      {countError || recent.error ? (
+        <EmptyState
+          title={t('errorTitle')}
+          body={t('errorBody')}
+          action={<Button label={t('retry')} onPress={() => refreshLibrary(services)} />}
+        />
+      ) : recent.loading ? (
+        <Loading label={t('loading')} />
+      ) : !recent.items.length ? (
+        <EmptyState title={t('emptyTitle')} body={t('emptyBody')} />
+      ) : (
         <View>
           <Text kind="title">{t('recent')}</Text>
           {recent.items.map(track => (
@@ -95,7 +118,7 @@ export function HomeScreen() {
   );
 }
 const styles = StyleSheet.create({
-  between: {justifyContent: 'space-between'},
+  between: {justifyContent: 'space-between', flexWrap: 'wrap'},
   hero: {gap: tokens.spacing.md, paddingVertical: tokens.spacing.lg},
   copy: {flex: 1, gap: tokens.spacing.md},
   stack: {flexDirection: 'column', alignItems: 'flex-start'},
