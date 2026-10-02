@@ -7,7 +7,7 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [x] P1-T01 Repository structure, contract, phase docs, ADR-001, privacy/security.
 - [x] P1-T02 Public GitHub repository and isolated feature commits.
 - [x] P1-T03 RN 0.87.1 New Architecture Android/iOS project.
-- [x] P1-T04 Strict TypeScript, lint, formatting, unit/component CI; local Node 23 test adapter repaired and 43 tests pass (2026-10-02).
+- [~] P1-T04 Strict TypeScript, lint, formatting, unit/component CI; local Node 23 SQLite adapter repaired. CI Node 24 playlist deletion test exposed an unflushed asynchronous React update; the test is repaired locally and 43 tests pass on Node 24, awaiting a new CI run.
 - [x] P1-T05 Domain contracts and stable errors.
 - [~] P1-T06 Tokens, sheets/dialogs/toasts/skeletons, native haptics, light/dark, EN/FA, RTL, motion/transparency fallbacks; iOS 27 accessibility audit passes, screen-reader/device matrix pending.
 - [x] P1-T07 SQLite adapter, transactional migrations, repositories and settings migrations.

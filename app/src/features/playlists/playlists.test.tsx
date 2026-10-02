@@ -73,7 +73,9 @@ it('creates, renames, removes membership and confirms deletion without deleting 
   await screen.findByRole('header', {name: 'Delete this playlist?'});
   const dialog = screen.UNSAFE_getAllByType(Modal).find(modal => modal.props.visible)!;
   await waitFor(() => expect(within(dialog).getByRole('button', {name: 'Delete'})).toBeEnabled());
-  fireEvent.press(within(dialog).getByRole('button', {name: 'Delete'}));
+  await act(async () => {
+    fireEvent.press(within(dialog).getByRole('button', {name: 'Delete'}));
+  });
   await waitFor(() => expect(screen.queryByRole('header', {name: 'Favorites'})).toBeNull());
   expect(await playlists.list()).toEqual([]);
   expect((await tracks.get(track.id))?.id).toBe(track.id);

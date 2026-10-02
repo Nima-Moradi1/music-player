@@ -45,7 +45,7 @@ Tests:
 
 ### P1-T04 — Strict tooling and CI
 
-Status: DONE
+Status: IN PROGRESS
 Depends: P1-T03
 Files: TypeScript/Jest/ESLint/Prettier configs, .github/workflows/quality.yml
 Acceptance:
@@ -54,7 +54,7 @@ Acceptance:
 
 Tests:
 
-- 2026-10-02 local Node 23: 43 tests/16 suites, typecheck, format and lint pass; eight dynamic-style lint warnings documented. The test SQLite adapter now handles Node 22/23 without `statement.columns()`.
+- 2026-10-02 local Node 23: 43 tests/16 suites, typecheck, format and lint pass; eight dynamic-style lint warnings documented. The test SQLite adapter now handles Node 22/23 without `statement.columns()`. Feature CI run 37046205237 failed a playlist deletion test on Node 24 because the async React update was outside `act`; the test fix passes all 43 tests locally under Node 24.18.0, with CI confirmation pending.
 
 ### P1-T05 — Domain contracts
 

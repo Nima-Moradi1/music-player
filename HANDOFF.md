@@ -1,6 +1,6 @@
 ﻿# HANDOFF
 
-Updated: 2026-10-02 21:44 Asia/Tehran
+Updated: 2026-10-02 21:51 Asia/Tehran
 Phase: 1 — Foundation, architecture, design system, local library
 Branch: feature/phase-01-foundation-gates
 Last commit: see `git log -1`
@@ -24,6 +24,7 @@ Status: PARTIAL
 - DONE native 10k diagnostics/search optimization — emulator search p95 reduced from 153 ms to 48 ms.
 - DONE journal/cold-boot recovery, orphan reconciliation and bounded embedded artwork in commits after the previous handoff.
 - DONE 2026-10-02 local Node 23 SQLite test adapter fix; 43 tests/16 suites, typecheck and format pass.
+- IN PROGRESS CI JavaScript gate: feature run 37046205237 reproduced a playlist deletion test failure on Node 24. The delete completed in SQLite, but its React state update escaped the test's `act` boundary. The test now awaits the confirm press inside async `act`; all 43 tests pass locally with Node 24.18.0. A new CI run is required.
 - IN PROGRESS Android CI regression: run 37028018129 fails compiling the new haptics module at `currentActivity`; local activity-reference fix is awaiting a fresh native build.
 - DONE 2026-10-02 iOS Xcode 27 Debug build/scene launch and complete simulator smoke script, including a passing UI test through onboarding, Library and Settings; smoke now checks process survival.
 - DONE iOS 27 accessibility audit for Home/Library/Settings after replacing `APP_NAME` with localized readable names.
@@ -55,7 +56,7 @@ Status: PARTIAL
 
 ## Next steps
 
-1. Run the pending Android Kotlin/native E2E build with pinned SDK inputs in CI; inspect the `reactApplicationContext.currentActivity` fix and Android E2E result.
+1. Finish the in-flight Android/iOS jobs in CI run 37046205237, then push the Node 24 playlist test fix and confirm the complete quality workflow.
 2. Close the remaining accessibility and native media/storage/E2E matrix in Phase 1; journal/reconciliation and bounded artwork are implemented.
 3. Extend iOS simulator import interactions and verify screen-reader/large-font behavior on native devices.
 4. Only after the Phase 1 exit gate passes, start the Phase 2 native audio engine.
@@ -75,6 +76,7 @@ Status: PARTIAL
 
 - PASS `pnpm typecheck`; `pnpm lint` — no errors, eight dynamic-style warnings.
 - PASS `pnpm test` — 43 tests in 16 suites on 2026-10-02.
+- PASS Node 24.18.0 full Jest suite — 43 tests/16 suites after wrapping the playlist delete interaction in async `act`; previous feature CI JavaScript job failed before this fix.
 - PASS `pnpm format:check`; `git diff --check`.
 - PASS `./scripts/android-windows.ps1 -JavaHome '<JDK21>' -AndroidSdk '<SDK>'` — debug build/three native tests.
 - PASS `pnpm --filter @music-player/app exec react-native bundle --platform android --dev false --entry-file index.js --bundle-output ../artifacts/index.android.bundle --assets-dest ../artifacts/android --max-workers 2`.
