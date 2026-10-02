@@ -158,6 +158,8 @@ class HapticsModule(context: ReactApplicationContext) : ReactContextBaseJavaModu
       "error" -> if (android.os.Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.LONG_PRESS
       else -> return
     }
-    currentActivity?.runOnUiThread { currentActivity?.window?.decorView?.performHapticFeedback(constant) }
+    reactApplicationContext.currentActivity?.let { activity ->
+      activity.runOnUiThread { activity.window?.decorView?.performHapticFeedback(constant) }
+    }
   }
 }

@@ -81,7 +81,7 @@ class Device:
             if horizontal:
                 coords = (x2 - 25, (y1 + y2) // 2, x1 + 25, (y1 + y2) // 2) if attempt < 6 else (x1 + 25, (y1 + y2) // 2, x2 - 25, (y1 + y2) // 2)
             else:
-                coords = ((x1 + x2) // 2, y2 - 60, (x1 + x2) // 2, y1 + 60)
+                coords = ((x1 + x2) // 2, y2 - 60, (x1 + x2) // 2, y1 + 60) if attempt < 6 else ((x1 + x2) // 2, y1 + 60, (x1 + x2) // 2, y2 - 60)
             self.run('shell', 'input', 'swipe', *(str(x) for x in coords), '300')
         raise AssertionError(f'Could not scroll to {label!r}')
 
@@ -261,7 +261,7 @@ def main():
         device.tap('Delete')
         device.wait('A new home for your songs')
         device.tap('Home')
-        device.tap('Settings')
+        device.tap_scrolled('Settings')
         device.tap('Light')
         device.evidence('light-settings')
         device.tap('Dark')
@@ -273,7 +273,7 @@ def main():
         downloads = device.wait('دانلودها')
         assert device.bounds(home)[0] > device.bounds(downloads)[0], 'Persian tabs must use RTL ordering'
         device.evidence('persian-rtl-tabs')
-        device.tap('تنظیمات')
+        device.tap_scrolled('تنظیمات')
         device.tap('English')
         for label in ['Reduce motion', 'Use solid surfaces', 'High contrast']:
             node = device.scroll_to(label)
