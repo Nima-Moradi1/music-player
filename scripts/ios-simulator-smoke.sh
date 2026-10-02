@@ -30,7 +30,21 @@ xcrun simctl launch --stdout="$artifact_dir/app.stdout.log" --stderr="$artifact_
 sleep 45
 xcrun simctl io "$device_id" screenshot "$artifact_dir/onboarding.png"
 xcrun simctl spawn "$device_id" log show --last 2m --style compact --predicate 'process == "MusicPlayer"' > "$artifact_dir/native.log"
-if grep -E 'Unhandled JS Exception|RCTFatal|Invalid hook call|Terminating app due to uncaught exception' "$artifact_dir"/*.log; then
+if ! xcrun simctl spawn "$device_id" launchctl list | grep -Fq "UIKitApplication:$bundle_id"; then
+  echo "App process exited before the smoke check" >&2
   exit 1
 fi
-echo "Simulator launched: $device_id / $bundle_id. Review onboarding.png for UI boot evidence."
+if grep -E 'Unhandled JS Exception|RCTFatal|Invalid hook call|Terminating app due to uncaught exception|Application failed to launch' "$artifact_dir"/*.log; then
+  exit 1
+fi
+result_bundle="$artifact_dir/foundation-ui-$(date +%Y%m%d%H%M%S).xcresult"
+xcodebuild \
+  -workspace app/ios/MusicPlayer.xcworkspace \
+  -scheme MusicPlayer \
+  -configuration Debug \
+  -destination "platform=iOS Simulator,id=$device_id" \
+  -derivedDataPath app/ios/build \
+  -resultBundlePath "$result_bundle" \
+  -parallel-testing-enabled NO \
+  CODE_SIGNING_ALLOWED=NO test > "$artifact_dir/foundation-ui.log" 2>&1
+echo "Simulator launch and Foundation UI test passed: $device_id / $bundle_id."
