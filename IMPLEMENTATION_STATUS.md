@@ -2,7 +2,7 @@
 
 Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-]` dropped with reason.
 
-## Phase 1 — Foundation
+## Phase 1 — Foundation.
 
 - [x] P1-T01 Repository structure, contract, phase docs, ADR-001, privacy/security.
 - [x] P1-T02 Public GitHub repository and isolated feature commits.
