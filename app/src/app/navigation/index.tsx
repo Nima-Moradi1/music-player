@@ -23,6 +23,7 @@ import {DownloadsScreen} from '../../features/downloads';
 import {SettingsScreen} from '../../features/settings';
 import {TelegramSettingsScreen} from '../../features/telegram';
 import {TrackDetailsScreen} from '../../features/player';
+import {LyricsScreen} from '../../features/lyrics';
 import {OnboardingScreen} from '../../features/onboarding';
 import type {RootStackParamList, TabParamList} from './types';
 import type {PlaybackController} from '../../domain/playback/PlaybackController';
@@ -210,6 +211,7 @@ export function AppNavigation() {
           component={TrackDetailsScreen}
           options={{title: t('trackDetails')}}
         />
+        <Stack.Screen name="Lyrics" component={LyricsScreen} options={{title: t('lyrics')}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

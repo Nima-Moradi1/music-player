@@ -3,6 +3,8 @@ import {StyleSheet} from 'react-native';
 import {useStore} from 'zustand';
 import {useTranslation} from 'react-i18next';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {
   Artwork,
   Button,
@@ -123,6 +125,26 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
         />
       )}
       {active && (
+        <Button
+          label={t('playbackSpeed', {rate: playback.rate})}
+          secondary
+          disabled={pending}
+          onPress={() => {
+            void action(() =>
+              audio.setRate(
+                playback.rate === 1
+                  ? 1.25
+                  : playback.rate === 1.25
+                    ? 1.5
+                    : playback.rate === 1.5
+                      ? 2
+                      : 1,
+              ),
+            );
+          }}
+        />
+      )}
+      {active && (
         <Row style={styles.controls}>
           <Button
             label={playback.sleepUntilMs ? t('cancelSleep') : t('sleepThirty')}
@@ -167,6 +189,7 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
 }
 export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackParamList, 'Details'>) {
   const services = useServices();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {t} = useTranslation();
   const version = useLibraryVersion();
   const [track, setTrack] = useState<Track | null>(null);
@@ -242,6 +265,11 @@ export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackPara
       <Artwork seed={track.id} uri={track.artworkPath} large />
       <Text kind="heading">{track.title}</Text>
       <Text muted>{track.artist || t('unknownArtist')}</Text>
+      <Button
+        label={t('lyrics')}
+        secondary
+        onPress={() => navigation.navigate('Lyrics', {trackId: track.id})}
+      />
       {track.managedPath && services.audio ? (
         <PlayerControls audio={services.audio} track={track} />
       ) : (

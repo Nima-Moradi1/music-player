@@ -12,6 +12,7 @@ import {fixtureTrack} from '../../testing/fixtures';
 import {migrate} from '../../infrastructure/database/migrations';
 import {SqliteTrackRepository} from '../../infrastructure/database/trackRepository';
 import {SqlitePlaylistRepository} from '../../infrastructure/database/playlistRepository';
+jest.mock('@react-navigation/native', () => ({useNavigation: () => ({navigate: jest.fn()})}));
 
 function details(services: Services, trackId: string) {
   const props = {route: {params: {trackId}}} as NativeStackScreenProps<

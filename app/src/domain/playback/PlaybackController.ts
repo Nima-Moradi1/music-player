@@ -13,6 +13,7 @@ export type PlayerState = {
   durationMs: number;
   queue: string[];
   repeatMode: 'off' | 'one' | 'all';
+  rate: 1 | 1.25 | 1.5 | 2;
   sleepUntilMs: number | null;
   repeatStartMs: number | null;
   repeatEndMs: number | null;
@@ -29,6 +30,7 @@ const empty: PlayerState = {
   durationMs: 0,
   queue: [],
   repeatMode: 'off',
+  rate: 1,
   sleepUntilMs: null,
   repeatStartMs: null,
   repeatEndMs: null,
@@ -47,8 +49,8 @@ export class PlaybackController {
   ) {}
 
   private save() {
-    const {trackId, positionMs, queue, repeatMode} = this.state.getState();
-    this.storage.set('resume', JSON.stringify({trackId, positionMs, queue, repeatMode}));
+    const {trackId, positionMs, queue, repeatMode, rate} = this.state.getState();
+    this.storage.set('resume', JSON.stringify({trackId, positionMs, queue, repeatMode, rate}));
   }
 
   async restore(): Promise<void> {
@@ -58,6 +60,7 @@ export class PlaybackController {
         positionMs?: number;
         queue?: string[];
         repeatMode?: PlayerState['repeatMode'];
+        rate?: PlayerState['rate'];
       } | null;
       if (!saved?.trackId) {
         return;
@@ -67,6 +70,8 @@ export class PlaybackController {
         return;
       }
       await this.native.load(track.managedPath, track.title, track.artist);
+      const rate = saved.rate === 1.25 || saved.rate === 1.5 || saved.rate === 2 ? saved.rate : 1;
+      await this.native.setRate(rate);
       const positionMs =
         saved.positionMs && saved.positionMs < track.durationMs - 5000 ? saved.positionMs : 0;
       if (positionMs) {
@@ -81,6 +86,7 @@ export class PlaybackController {
         queue: saved.queue?.filter(id => typeof id === 'string') ?? [track.id],
         repeatMode:
           saved.repeatMode === 'one' || saved.repeatMode === 'all' ? saved.repeatMode : 'off',
+        rate,
       });
       this.startPolling();
     } catch {
@@ -93,6 +99,7 @@ export class PlaybackController {
       throw new Error('This entry has no audio file');
     }
     await this.native.load(track.managedPath, track.title, track.artist);
+    await this.native.setRate(this.state.getState().rate);
     await this.native.setABRepeat(-1, -1);
     this.state.setState({
       trackId: track.id,
@@ -183,6 +190,12 @@ export class PlaybackController {
 
   setRepeatMode(mode: PlayerState['repeatMode']): void {
     this.state.setState({repeatMode: mode});
+    this.save();
+  }
+
+  async setRate(rate: PlayerState['rate']): Promise<void> {
+    await this.native.setRate(rate);
+    this.state.setState({rate});
     this.save();
   }
 

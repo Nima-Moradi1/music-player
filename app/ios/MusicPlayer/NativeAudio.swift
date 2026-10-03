@@ -9,6 +9,7 @@ final class NativeAudio: NSObject {
   private var ended = false
   private var title = ""
   private var artist = ""
+  private var preferredRate: Float = 1
   private var observers: [NSObjectProtocol] = []
   private var sleepTask: DispatchWorkItem?
   private var repeatStartMs = -1.0
@@ -21,7 +22,7 @@ final class NativeAudio: NSObject {
   override init() {
     super.init()
     let commands = MPRemoteCommandCenter.shared()
-    commands.playCommand.addTarget { [weak self] _ in self?.player?.play(); self?.updateNowPlaying(); return .success }
+    commands.playCommand.addTarget { [weak self] _ in self?.player?.rate = self?.preferredRate ?? 1; self?.updateNowPlaying(); return .success }
     commands.pauseCommand.addTarget { [weak self] _ in self?.player?.pause(); self?.updateNowPlaying(); return .success }
     commands.changePlaybackPositionCommand.addTarget { [weak self] event in
       guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
@@ -97,7 +98,7 @@ final class NativeAudio: NSObject {
   }
   @objc func play(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
     guard let player else { reject("PLAYBACK_ERROR", "No track loaded", nil); return }
-    player.play(); ended = false; updateNowPlaying(); resolve(nil)
+    player.rate = preferredRate; ended = false; updateNowPlaying(); resolve(nil)
   }
   @objc func pause(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
     player?.pause(); updateNowPlaying(); resolve(nil)
@@ -115,7 +116,8 @@ final class NativeAudio: NSObject {
   }
   @objc func setRate(_ rate: Double, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
     guard (0.5...2.0).contains(rate) else { reject("PLAYBACK_ERROR", "Invalid rate", nil); return }
-    if let player, player.rate > 0 { player.rate = Float(rate) }
+    preferredRate = Float(rate)
+    if let player, player.rate > 0 { player.rate = preferredRate }
     resolve(nil)
   }
   @objc func setVolume(_ value: Double, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {

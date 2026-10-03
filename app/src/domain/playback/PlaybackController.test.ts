@@ -142,3 +142,16 @@ it('previous restarts after three seconds and otherwise loads the prior queued t
   await controller.previous();
   expect(controller.state.getState().trackId).toBe(first.id);
 });
+
+it('restores playback speed and delegates changes while paused', async () => {
+  jest.useFakeTimers();
+  const {first, native, tracks, controller} = setup();
+  await controller.playTrack(first);
+  await controller.toggle();
+  await controller.setRate(1.5);
+  expect(native.setRate).toHaveBeenLastCalledWith(1.5);
+  const restored = new PlaybackController(native, tracks);
+  await restored.restore();
+  expect(restored.state.getState().rate).toBe(1.5);
+  expect(native.setRate).toHaveBeenLastCalledWith(1.5);
+});

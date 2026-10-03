@@ -3,6 +3,7 @@ export type RootStackParamList = {
   Settings: undefined;
   TelegramSettings: undefined;
   Details: {trackId: string};
+  Lyrics: {trackId: string};
 };
 export type TabParamList = {
   Home: undefined;
