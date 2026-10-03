@@ -41,7 +41,7 @@ Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/
 
 ## Phase 4 — Advanced experience
 
-- [~] P4-T01 Local plain/LRC lyrics, SQLite cache, active line and offset UI; bounded native embedded extraction added for iOS and Android MP3. Track language codes and manual selection now include English, Spanish, German and Italian; native language-tag extraction remains open. Device verification, other Android formats and approved-provider/licensing gate pending.
+- [~] P4-T01 Local plain/LRC lyrics, SQLite cache, active line and offset UI; bounded native embedded extraction added for iOS and Android MP3. Track language codes and manual selection now include English, Spanish, German and Italian. iOS common song-language metadata flows into import classification; native CI and device verification, Android language-tag extraction/other formats and approved-provider/licensing gate pending.
 - [~] P4-T02 Bounded on-device artist/genre/album recommendations query playable matches beyond the first title page. User-triggered MusicBrainz recording metadata discovery now uses local ranking, rate limiting and source links; commercial terms/device checks and broader licensed sources pending.
 - [~] P4-T03 Disabled licensed-provider/transfer contract and rights/URL/storage gates reuse managed import; approved provider, native transfer and UI pending.
 - [ ] P4-T04 Android widget and iOS WidgetKit/App Intents.

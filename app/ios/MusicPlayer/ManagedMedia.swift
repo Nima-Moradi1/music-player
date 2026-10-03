@@ -132,6 +132,8 @@ final class ManagedMedia: NSObject {
           "mimeType": mime, "extension": ext, "fileSize": size, "durationMs": Int(duration.seconds * 1000),
           "title": await value(.commonKeyTitle), "artist": await value(.commonKeyArtist), "album": await value(.commonKeyAlbumName),
           "genre": await value(.commonKeyType), "artworkPath": artwork as Any? ?? NSNull()]
+        let language = (await value(.commonKeyLanguage)).trimmingCharacters(in: .whitespacesAndNewlines)
+        if !language.isEmpty && language.utf8.count <= 35 { object["metadataLanguage"] = language }
         if let embeddedLyrics { object["embeddedLyrics"] = embeddedLyrics }
         try self.check(id)
         resolve(String(data: try JSONSerialization.data(withJSONObject: object), encoding: .utf8))

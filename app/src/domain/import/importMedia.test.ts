@@ -61,6 +61,16 @@ describe('managed import transaction', () => {
       source,
     );
   });
+  it('uses the inspected song language when available', async () => {
+    const {files, tracks, importer} = setup();
+    const inspected = await files.inspect('temp', new AbortController().signal);
+    files.inspect.mockResolvedValueOnce({
+      ...inspected,
+      metadataLanguage: 'de-DE',
+    });
+    await importer.import('picked', source, new AbortController().signal);
+    expect(tracks.save).toHaveBeenCalledWith(expect.objectContaining({language: 'de'}), source);
+  });
   it('keeps one physical file while preserving duplicate provenance', async () => {
     const {files, tracks, importer} = setup(true);
     expect((await importer.import('picked', source, new AbortController().signal)).duplicate).toBe(

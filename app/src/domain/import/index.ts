@@ -66,7 +66,7 @@ export type InspectedMedia = {
   durationMs: number;
   artworkPath: string | null;
   embeddedLyrics?: string | undefined;
-  metadataLanguage?: string;
+  metadataLanguage?: string | undefined;
 };
 export interface ManagedFilesystem {
   stage(uri: string, maxBytes: number, signal: AbortSignal): Promise<string>;
