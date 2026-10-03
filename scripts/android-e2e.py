@@ -27,11 +27,18 @@ class Device:
 
     def tree(self):
         # A file dump avoids /dev/tty output truncation on newer Android versions.
-        for _ in range(3):
+        for attempt in range(6):
             self.run('shell', 'uiautomator', 'dump', '/sdcard/music-player-ui.xml')
             xml = self.run('exec-out', 'cat', '/sdcard/music-player-ui.xml')
             (self.artifacts / 'last-ui.xml').write_text(xml)
-            root = ET.fromstring(xml)
+            try:
+                root = ET.fromstring(xml)
+            except ET.ParseError:
+                # UIAutomator can briefly return an empty/partial dump during launch.
+                if attempt == 5:
+                    raise
+                time.sleep(0.5)
+                continue
             launcher_anr = any(
                 node.get('package') == 'android'
                 and node.get('text', '').endswith("Launcher isn't responding")
