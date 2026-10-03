@@ -7,7 +7,7 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [x] P1-T01 Repository structure, contract, phase docs, ADR-001, privacy/security.
 - [x] P1-T02 Public GitHub repository and isolated feature commits.
 - [x] P1-T03 RN 0.87.1 New Architecture Android/iOS project.
-- [~] P1-T04 Strict TypeScript, lint, formatting, unit/component CI. JavaScript and Android native build/tests passed in run 37098359433; iOS CI and Android E2E gate remain open.
+- [~] P1-T04 Strict TypeScript, lint, formatting, unit/component CI. JavaScript and Android native build/tests passed in run 37098359433; local current-source iOS simulator Debug build passed; iOS CI and Android E2E gate remain open.
 - [x] P1-T05 Domain contracts and stable errors.
 - [~] P1-T06 Tokens, sheets/dialogs/toasts/skeletons, native haptics, light/dark, EN/FA, RTL, motion/transparency fallbacks; iOS 27 Home/Library/Settings audits, accessibility-medium text size and Persian settings/RTL persistence pass. Screen-reader/device matrix pending.
 - [x] P1-T07 SQLite adapter, transactional migrations, repositories and settings migrations.

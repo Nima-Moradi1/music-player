@@ -54,7 +54,7 @@ Acceptance:
 
 Tests:
 
-- 2026-10-03 local: 51 tests/20 suites, typecheck, format and lint pass; eight existing dynamic-style lint warnings. JavaScript CI passed on aa08b05 (run 37098359433); that run also passed Android `assembleDebug testDebugUnitTest`. iOS CI for the current audio source was still running when recorded.
+- 2026-10-03 local: 51 tests/20 suites, typecheck, format and lint pass; eight existing dynamic-style lint warnings. JavaScript CI passed on aa08b05 (run 37098359433); that run also passed Android `assembleDebug testDebugUnitTest`. Local iOS 27 simulator Debug build passes with the current Telegram navigation; iOS CI was still running when recorded.
 
 ### P1-T05 — Domain contracts
 

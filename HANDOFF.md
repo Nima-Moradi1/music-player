@@ -10,7 +10,7 @@ Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS; Phase 3 foundation IN PROGRESS.
 - RN 0.87.1 offline library, managed imports, SQLite/MMKV, EN/FA UI and native Android Media3/iOS AVPlayer playback are implemented. Player has saved position/manual queue, native sleep timer and A–B repeat. Device playback matrix remains unverified.
 - Telegram preferences are reachable from Settings and persist explicit source, transfer and consent choices. Consent defaults off. Connection is honestly unavailable. Typed, bounded Main/Archive scanner core and SQLite cursors are implemented and tested, but there is no TDLib bridge, login, download or sync.
 - Local verification on 2026-10-03: 51 tests/20 suites, typecheck, lint (0 errors, eight existing warnings), format check, Python compile and diff check pass.
-- CI run 37098359433 passed JavaScript and Android `assembleDebug testDebugUnitTest` on native audio source. Android E2E passed onboarding/tab navigation, then stalled in DocumentsUI while Pixel Launcher showed an ANR. Picker/ANR retry was pushed in 3a5b19e; current commit rerun pending. iOS CI was still in progress when recorded. Local iOS 27 simulator Debug build and three navigation/accessibility/Persian UI tests had passed before this Telegram UI change.
+- CI run 37098359433 passed JavaScript and Android `assembleDebug testDebugUnitTest` on native audio source. Android E2E passed onboarding/tab navigation, then stalled in DocumentsUI while Pixel Launcher showed an ANR. Picker/ANR retry was pushed in 3a5b19e; current commit rerun pending. iOS CI was still in progress when recorded. A fresh local iOS 27 simulator Debug build passes with the Telegram navigation change; three navigation/accessibility/Persian UI tests passed before that change.
 
 ## Open gates
 
