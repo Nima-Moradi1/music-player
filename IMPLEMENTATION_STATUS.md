@@ -32,7 +32,7 @@ Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/
 
 ## Phase 3 — Telegram
 
-- [!] P3-T01 Own API credentials, native TDLib packaging, secure keys and auth; credentials/native integration and `BLOCKER-TELEGRAM-COMPLIANCE` pending.
+- [!] P3-T01 Own API credentials, native TDLib packaging, secure keys and auth; Telegram's app-creation page repeatedly returns the generic `ERROR` or `[object Object]` (also reported at bugs.telegram.org/c/62207). Credentials/native integration and `BLOCKER-TELEGRAM-COMPLIANCE` pending.
 - [~] P3-T02 Persisted opt-in consent, Saved Messages/private-chat scope, network, pause, exclusion and storage policy with honest unavailable connection state; auth and native execution pending.
 - [~] P3-T03 Bounded scanner reconciles new messages and older backfill with transactional SQLite cursors and bounded transient retries; TDLib adapter/device evidence pending.
 - [~] P3-T04 Policy-gated import core reuses atomic managed import, hash dedupe and provenance; bounded scheduler and temp cleanup exist, TDLib transfer/progress UI pending.
@@ -41,9 +41,9 @@ Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/
 
 ## Phase 4 — Advanced experience
 
-- [~] P4-T01 Local plain/LRC lyrics, SQLite cache, active line and offset UI; bounded native embedded extraction added for iOS and Android MP3. Track language codes and manual selection include English, Spanish, German and Italian. iOS common song-language metadata flows into import classification; native build and simulator smoke passed in run 37125379473. Device verification, Android language-tag extraction/other formats and approved-provider/licensing gate remain open.
-- [~] P4-T02 Bounded on-device artist/genre/album recommendations query playable matches beyond the first title page. User-triggered MusicBrainz recording metadata discovery now uses local ranking, rate limiting and source links; commercial terms/device checks and broader licensed sources pending.
-- [~] P4-T03 Disabled licensed-provider/transfer contract and rights/URL/storage gates reuse managed import; approved provider, native transfer and UI pending.
+- [~] P4-T01 Local plain/LRC and embedded lyrics, offset UI and EN/ES/DE/IT selection; user-triggered Wikisource plain-text results now display matching open works with source attribution. Online coverage is intentionally limited; iOS device/accessibility evidence and Android language extraction remain open.
+- [~] P4-T02 Bounded on-device artist/genre/album recommendations and user-triggered MusicBrainz recording metadata discovery. The Downloads tab seeds a licensed Commons search from the selected track. Recommendation quality/device checks remain open.
+- [~] P4-T03 Wikimedia Commons catalog search accepts only supported audio with explicit CC0/CC BY/CC BY-SA metadata, author and license URL; rechecks rights before an iOS bounded native transfer, imports through managed hash dedupe and persists attribution. Contract/catalog tests pass; iOS CI/device transfer evidence and Android transfer remain open.
 - [ ] P4-T04 Android widget and iOS WidgetKit/App Intents.
 - [ ] P4-T05 Advanced EQ/gestures/visuals and responsive accessibility/performance.
 
