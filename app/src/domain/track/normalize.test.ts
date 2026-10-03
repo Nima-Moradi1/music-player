@@ -13,6 +13,10 @@ describe('local categorization and search', () => {
     expect(classifyLanguage({text: 'سلام', metadataLanguage: 'fa-IR'}).language).toBe('fa');
     expect(classifyLanguage({text: 'Song', metadataLanguage: 'de-DE'}).language).toBe('de');
     expect(classifyLanguage({text: 'Song', metadataLanguage: 'it_IT'}).language).toBe('it');
+    expect(classifyLanguage({text: 'Song', metadataLanguage: 'eng'}).language).toBe('en');
+    expect(classifyLanguage({text: 'Song', metadataLanguage: 'spa'}).language).toBe('es');
+    expect(classifyLanguage({text: 'Song', metadataLanguage: 'deu'}).language).toBe('de');
+    expect(classifyLanguage({text: 'Song', metadataLanguage: 'ita'}).language).toBe('it');
     expect(
       classifyLanguage({
         text: 'سلام',

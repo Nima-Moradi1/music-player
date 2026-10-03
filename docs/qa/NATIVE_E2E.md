@@ -26,7 +26,7 @@ The flow asserts native UI and persisted SQLite/media behavior:
 
 The flow does not establish physical-device performance, screen-reader traversal, every adaptive layout, insufficient-storage behavior, or iOS interaction. These remain separate checks in [DEVICE_MATRIX.md](DEVICE_MATRIX.md). The existing iOS simulator launch smoke continues to capture boot logs and onboarding screenshots.
 
-GitHub run `37100739974` completed with JavaScript success and failures in **Android Native import and library E2E** and **iOS Simulator launch smoke**. The supplied iOS console excerpt shows simulator boot, app launch and screenshot success, followed by exit 65 from `xcodebuild test`. That command redirects its output to `artifacts/ios-smoke/foundation-ui.log`, which was not included in the excerpt. The smoke script now prints its last 160 lines on failure. The failing UI assertion or build error remains unknown until that artifact or a new run is available. The user has deferred Android investigation.
+GitHub run `37100739974` completed with JavaScript success and failures in **Android Native import and library E2E** and **iOS Simulator launch smoke**. The supplied iOS console excerpt shows simulator boot, app launch and screenshot success, followed by exit 65 from `xcodebuild test`. That command redirects its output to `artifacts/ios-smoke/foundation-ui.log`, which was not included in the excerpt. Run `37123187195` failed the iOS smoke again, but run `37124962862` passed simulator build, launch and Foundation UI tests on commit `6d1a237`. The earlier failure did not reproduce; the smoke script now prints and annotates test errors if one returns. The user has deferred Android investigation.
 
 ## Environment observed on 2026-10-02
 

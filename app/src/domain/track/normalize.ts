@@ -19,8 +19,19 @@ export function classifyLanguage(input: {
     return {language: input.correction, confidence: 1};
   }
   const code = input.metadataLanguage?.toLowerCase().split(/[-_]/)[0];
-  if (code && ['fa', 'en', 'ar', 'es', 'de', 'it'].includes(code)) {
-    return {language: code as Language, confidence: 0.95};
+  const aliases: Record<string, Language> = {
+    eng: 'en',
+    spa: 'es',
+    deu: 'de',
+    ger: 'de',
+    ita: 'it',
+    fas: 'fa',
+    per: 'fa',
+    ara: 'ar',
+  };
+  const language = code ? (aliases[code] ?? code) : undefined;
+  if (language && ['fa', 'en', 'ar', 'es', 'de', 'it'].includes(language)) {
+    return {language: language as Language, confidence: 0.95};
   }
   // Script is useful evidence but cannot distinguish Persian/Arabic or Latin languages.
   return {language: 'other', confidence: 0};
