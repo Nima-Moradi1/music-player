@@ -74,6 +74,14 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
       {active && (
         <Row style={styles.controls}>
           <Button
+            label={t('previousTrack')}
+            secondary
+            disabled={pending}
+            onPress={() => {
+              void action(() => audio.previous());
+            }}
+          />
+          <Button
             label={t('forwardTen')}
             secondary
             disabled={pending}
@@ -102,6 +110,18 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
         />
       )}
       {active && <Text muted>{t('queueCount', {count: playback.queue.length})}</Text>}
+      {active && (
+        <Button
+          label={t(`repeat_${playback.repeatMode}`)}
+          secondary
+          disabled={pending}
+          onPress={() => {
+            audio.setRepeatMode(
+              playback.repeatMode === 'off' ? 'all' : playback.repeatMode === 'all' ? 'one' : 'off',
+            );
+          }}
+        />
+      )}
       {active && (
         <Row style={styles.controls}>
           <Button

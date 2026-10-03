@@ -103,3 +103,42 @@ it('restarts the final song from zero after the queue ends', async () => {
   expect(native.seekTo).toHaveBeenCalledWith(0);
   expect(controller.state.getState().playing).toBe(true);
 });
+
+it('repeats one song or the whole queue on completion and preserves the mode', async () => {
+  jest.useFakeTimers();
+  const {first, second, native, tracks, controller} = setup();
+  await controller.playTrack(first);
+  controller.enqueue(second);
+  controller.setRepeatMode('one');
+  native.getState.mockResolvedValueOnce(
+    JSON.stringify({playing: false, ended: true, positionMs: 60000, durationMs: 60000}),
+  );
+  await controller.refresh();
+  expect(native.seekTo).toHaveBeenLastCalledWith(0);
+  expect(controller.state.getState().trackId).toBe(first.id);
+  controller.setRepeatMode('all');
+  await controller.next();
+  native.getState.mockResolvedValueOnce(
+    JSON.stringify({playing: false, ended: true, positionMs: 60000, durationMs: 60000}),
+  );
+  await controller.refresh();
+  expect(controller.state.getState().trackId).toBe(first.id);
+  expect(JSON.parse(mockSaved.get('resume') ?? '{}').repeatMode).toBe('all');
+  const restored = new PlaybackController(native, tracks);
+  await restored.restore();
+  expect(restored.state.getState().repeatMode).toBe('all');
+});
+
+it('previous restarts after three seconds and otherwise loads the prior queued track', async () => {
+  jest.useFakeTimers();
+  const {first, second, native, controller} = setup();
+  await controller.playTrack(first);
+  controller.enqueue(second);
+  await controller.next();
+  await controller.seekTo(8000);
+  await controller.previous();
+  expect(controller.state.getState().trackId).toBe(second.id);
+  expect(native.seekTo).toHaveBeenLastCalledWith(0);
+  await controller.previous();
+  expect(controller.state.getState().trackId).toBe(first.id);
+});

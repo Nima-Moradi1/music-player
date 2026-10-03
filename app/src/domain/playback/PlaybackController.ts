@@ -12,6 +12,7 @@ export type PlayerState = {
   positionMs: number;
   durationMs: number;
   queue: string[];
+  repeatMode: 'off' | 'one' | 'all';
   sleepUntilMs: number | null;
   repeatStartMs: number | null;
   repeatEndMs: number | null;
@@ -27,6 +28,7 @@ const empty: PlayerState = {
   positionMs: 0,
   durationMs: 0,
   queue: [],
+  repeatMode: 'off',
   sleepUntilMs: null,
   repeatStartMs: null,
   repeatEndMs: null,
@@ -45,8 +47,8 @@ export class PlaybackController {
   ) {}
 
   private save() {
-    const {trackId, positionMs, queue} = this.state.getState();
-    this.storage.set('resume', JSON.stringify({trackId, positionMs, queue}));
+    const {trackId, positionMs, queue, repeatMode} = this.state.getState();
+    this.storage.set('resume', JSON.stringify({trackId, positionMs, queue, repeatMode}));
   }
 
   async restore(): Promise<void> {
@@ -55,6 +57,7 @@ export class PlaybackController {
         trackId?: string;
         positionMs?: number;
         queue?: string[];
+        repeatMode?: PlayerState['repeatMode'];
       } | null;
       if (!saved?.trackId) {
         return;
@@ -76,6 +79,8 @@ export class PlaybackController {
         positionMs,
         durationMs: track.durationMs,
         queue: saved.queue?.filter(id => typeof id === 'string') ?? [track.id],
+        repeatMode:
+          saved.repeatMode === 'one' || saved.repeatMode === 'all' ? saved.repeatMode : 'off',
       });
       this.startPolling();
     } catch {
@@ -176,9 +181,48 @@ export class PlaybackController {
     this.save();
   }
 
-  async next(): Promise<void> {
-    const {queue, trackId} = this.state.getState();
-    const nextId = queue[queue.indexOf(trackId ?? '') + 1];
+  setRepeatMode(mode: PlayerState['repeatMode']): void {
+    this.state.setState({repeatMode: mode});
+    this.save();
+  }
+
+  async previous(): Promise<void> {
+    const {queue, trackId, positionMs} = this.state.getState();
+    if (positionMs > 3000) {
+      await this.seekTo(0);
+      return;
+    }
+    const previousId = queue[queue.indexOf(trackId ?? '') - 1];
+    if (!previousId) {
+      await this.seekTo(0);
+      return;
+    }
+    const track = await this.tracks.get(previousId);
+    if (!track?.managedPath) {
+      this.state.setState({queue: queue.filter(id => id !== previousId)});
+      this.save();
+      return this.previous();
+    }
+    const wasPlaying = this.state.getState().playing;
+    await this.load(track, this.state.getState().queue);
+    if (wasPlaying) {
+      await this.native.play();
+      this.state.setState({playing: true});
+    }
+  }
+
+  async next(automatic = false): Promise<void> {
+    const {queue, trackId, repeatMode} = this.state.getState();
+    if (automatic && repeatMode === 'one') {
+      await this.native.seekTo(0);
+      await this.native.play();
+      this.state.setState({positionMs: 0, playing: true, ended: false});
+      this.save();
+      return;
+    }
+    const nextId =
+      queue[queue.indexOf(trackId ?? '') + 1] ??
+      (automatic && repeatMode === 'all' ? queue[0] : undefined);
     if (!nextId) {
       await this.native.pause();
       this.state.setState({playing: false, ended: true});
@@ -191,7 +235,7 @@ export class PlaybackController {
     const track = await this.tracks.get(nextId);
     if (!track?.managedPath) {
       this.state.setState({queue: queue.filter(id => id !== nextId)});
-      return this.next();
+      return this.next(automatic);
     }
     await this.load(track, queue);
     await this.native.play();
@@ -215,7 +259,7 @@ export class PlaybackController {
     try {
       const native = JSON.parse(await this.native.getState()) as NativePlaybackState;
       if (native.ended) {
-        await this.next();
+        await this.next(true);
         return;
       }
       this.state.setState({
