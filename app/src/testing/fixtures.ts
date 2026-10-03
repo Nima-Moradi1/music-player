@@ -1,7 +1,7 @@
 import type {Track} from '../domain/track';
 import {normalizeSearch} from '../domain/track/normalize';
 export function fixtureTrack(index: number): Track {
-  const languages = ['fa', 'en', 'ar', 'es', 'other'] as const;
+  const languages = ['fa', 'en', 'ar', 'es', 'de', 'it', 'other'] as const;
   const language = languages[index % languages.length] ?? 'other';
   const title =
     language === 'fa' ? `آهنگ نمونه ${index}` : `Demo song ${String(index).padStart(5, '0')}`;

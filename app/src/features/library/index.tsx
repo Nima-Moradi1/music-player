@@ -158,7 +158,7 @@ export function LibraryScreen() {
             contentContainerStyle={styles.chips}
             accessibilityLabel={t('languageFilter')}
           >
-            {([undefined, 'fa', 'en', 'ar', 'es', 'other'] as const).map(item => (
+            {([undefined, 'fa', 'en', 'ar', 'es', 'de', 'it', 'other'] as const).map(item => (
               <Button
                 key={item ?? 'all'}
                 selected={language === item}
