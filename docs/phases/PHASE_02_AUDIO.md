@@ -32,8 +32,9 @@ Open: native-owned queue, shuffle/repeat, completion threshold, crash and proces
 
 Status: IN PROGRESS
 Files: details/player, mini-player, localization.
-Implemented: localized play/pause, 10-second seek, manual enqueue, queue count and next controls; visible alternatives are present.
-Open: full player layout, seek slider/tooltip, queue sheet, gesture registry/customization, sleep timer and A–B repeat.
+Implemented: localized play/pause, 10-second seek, manual enqueue, queue count and next controls; native 30-minute sleep timer and A–B repeat with visible buttons.
+Evidence: 3 controller tests pass; iOS 27 simulator Debug build succeeds after native timer/repeat changes.
+Open: full player layout, seek slider/tooltip, queue sheet, gesture registry/customization and device playback checks.
 
 ### P2-T05 — DSP and visuals
 

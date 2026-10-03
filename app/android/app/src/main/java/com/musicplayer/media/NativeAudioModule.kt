@@ -43,6 +43,7 @@ class NativeAudioModule(private val context: ReactApplicationContext) : ReactCon
       .setMediaMetadata(MediaMetadata.Builder().setTitle(title).setArtist(artist).build())
       .build()
     player.setMediaItem(item)
+    PlaybackService.instance?.setABRepeat(-1, -1)
     player.prepare()
     null
   }
@@ -56,6 +57,15 @@ class NativeAudioModule(private val context: ReactApplicationContext) : ReactCon
   }
   @ReactMethod fun setVolume(value: Double, promise: Promise) = withPlayer(promise) {
     require(value in 0.0..1.0) { "Invalid volume" }; it.volume = value.toFloat(); null
+  }
+  @ReactMethod fun setSleepTimer(seconds: Double, promise: Promise) = withPlayer(promise) {
+    require(seconds.isFinite() && seconds >= 0 && seconds <= 86400) { "Invalid sleep timer" }
+    PlaybackService.instance?.setSleepTimer(seconds.toInt()); null
+  }
+  @ReactMethod fun setABRepeat(startMs: Double, endMs: Double, promise: Promise) = withPlayer(promise) {
+    require((startMs == -1.0 && endMs == -1.0) ||
+      (startMs.isFinite() && endMs.isFinite() && startMs >= 0 && endMs > startMs)) { "Invalid A-B repeat" }
+    PlaybackService.instance?.setABRepeat(startMs.toLong(), endMs.toLong()); null
   }
   @ReactMethod fun getState(promise: Promise) = withPlayer(promise) { player ->
     JSONObject().apply {

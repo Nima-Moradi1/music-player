@@ -30,7 +30,8 @@ xcrun simctl launch --stdout="$artifact_dir/app.stdout.log" --stderr="$artifact_
 sleep 45
 xcrun simctl io "$device_id" screenshot "$artifact_dir/onboarding.png"
 xcrun simctl spawn "$device_id" log show --last 2m --style compact --predicate 'process == "MusicPlayer"' > "$artifact_dir/native.log"
-if ! xcrun simctl spawn "$device_id" launchctl list | grep -Fq "UIKitApplication:$bundle_id"; then
+xcrun simctl spawn "$device_id" launchctl list > "$artifact_dir/launchctl.txt"
+if ! grep -Fq "UIKitApplication:$bundle_id" "$artifact_dir/launchctl.txt"; then
   echo "App process exited before the smoke check" >&2
   exit 1
 fi

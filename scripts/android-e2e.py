@@ -215,7 +215,16 @@ def main():
             device.run('push', str(path), '/sdcard/Download/' + path.name)
         device.run('shell', 'am', 'start', '-n', package + '/.MainActivity')
         device.wait('Make it yours', timeout=120)
-        device.tap('Make it yours')
+        # First emulator input can be swallowed while the launcher settles.
+        for attempt in range(6):
+            tree = device.tree()
+            if device.find(tree, 'Library') is not None:
+                break
+            start = device.find(tree, 'Make it yours')
+            if start is not None:
+                print(f'ONBOARD tap {attempt + 1}', flush=True)
+                device.tap_node(start)
+            time.sleep(2)
         device.wait('Library')
         device.evidence('onboarding-tabs')
         device.tap('Discover')

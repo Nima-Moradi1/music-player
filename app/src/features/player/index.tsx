@@ -52,7 +52,7 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
           ? `${clock(playback.positionMs)} / ${clock(playback.durationMs)}`
           : clock(track.durationMs)}
       </Text>
-      <Row>
+      <Row style={styles.controls}>
         <Button
           label={active && playback.playing ? t('pause') : t('play')}
           disabled={pending}
@@ -72,7 +72,7 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
         )}
       </Row>
       {active && (
-        <Row>
+        <Row style={styles.controls}>
           <Button
             label={t('forwardTen')}
             secondary
@@ -102,6 +102,45 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
         />
       )}
       {active && <Text muted>{t('queueCount', {count: playback.queue.length})}</Text>}
+      {active && (
+        <Row style={styles.controls}>
+          <Button
+            label={playback.sleepUntilMs ? t('cancelSleep') : t('sleepThirty')}
+            secondary
+            disabled={pending}
+            onPress={() => {
+              void action(() => audio.setSleepTimer(playback.sleepUntilMs ? 0 : 30));
+            }}
+          />
+          <Button
+            label={
+              playback.repeatEndMs !== null
+                ? t('clearAB')
+                : playback.repeatStartMs !== null
+                  ? t('markB')
+                  : t('markA')
+            }
+            secondary
+            disabled={
+              pending ||
+              (playback.repeatStartMs !== null &&
+                playback.repeatEndMs === null &&
+                playback.positionMs <= playback.repeatStartMs)
+            }
+            onPress={() => {
+              void action(() => {
+                if (playback.repeatEndMs !== null) {
+                  return audio.setABRepeat(null, null);
+                }
+                if (playback.repeatStartMs !== null) {
+                  return audio.setABRepeat(playback.repeatStartMs, playback.positionMs);
+                }
+                return audio.markRepeatStart(playback.positionMs);
+              });
+            }}
+          />
+        </Row>
+      )}
       {error && <Text accessibilityLiveRegion="polite">{t('playbackFailed')}</Text>}
     </Surface>
   );
@@ -262,6 +301,7 @@ export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackPara
 }
 
 const styles = StyleSheet.create({
+  controls: {flexWrap: 'wrap'},
   metadata: {flexWrap: 'wrap', gap: tokens.spacing.sm},
   value: {flexShrink: 1},
 });

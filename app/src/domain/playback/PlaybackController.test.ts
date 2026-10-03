@@ -27,6 +27,8 @@ function setup() {
     seekTo: jest.fn(async () => undefined),
     setRate: jest.fn(async () => undefined),
     setVolume: jest.fn(async () => undefined),
+    setSleepTimer: jest.fn(async () => undefined),
+    setABRepeat: jest.fn(async () => undefined),
     getState: jest.fn(async () =>
       JSON.stringify({playing: true, ended: false, positionMs: 12000, durationMs: 60000}),
     ),
@@ -70,4 +72,20 @@ it('advances through a persisted queue when native playback ends', async () => {
   expect(native.play).toHaveBeenCalledTimes(2);
   expect(controller.state.getState().trackId).toBe(second.id);
   expect(JSON.parse(mockSaved.get('resume') ?? '{}').queue).toEqual([first.id, second.id]);
+});
+
+it('delegates sleep and A-B repeat to native playback', async () => {
+  jest.useFakeTimers();
+  const {first, native, controller} = setup();
+  await controller.playTrack(first);
+  await controller.setSleepTimer(30);
+  await controller.markRepeatStart(5000);
+  await controller.setABRepeat(5000, 15000);
+  expect(native.setSleepTimer).toHaveBeenCalledWith(1800);
+  expect(native.setABRepeat).toHaveBeenLastCalledWith(5000, 15000);
+  expect(controller.state.getState().repeatEndMs).toBe(15000);
+  await controller.setSleepTimer(0);
+  await controller.setABRepeat(null, null);
+  expect(native.setSleepTimer).toHaveBeenLastCalledWith(0);
+  expect(native.setABRepeat).toHaveBeenLastCalledWith(-1, -1);
 });

@@ -158,7 +158,7 @@ Acceptance:
 
 Tests:
 
-- Java 21/SDK 37; x86_64 API 36.0 emulator. Feature CI run 37046205237 passed `assembleDebug testDebugUnitTest`. Run 37058805923 booted the app, but UIAutomator returned a malformed transient dump at onboarding; retry is committed in 41ff79f. Current-source Android build/E2E is pending. Local Gradle cannot fetch Google's SDK manifests; project build inputs remain unchanged.
+- Java 21/SDK 37; x86_64 API 36.0 emulator. Feature CI run 37046205237 passed `assembleDebug testDebugUnitTest`. Run 37058805923 booted the app, but UIAutomator returned a malformed transient dump at onboarding; retry is committed in 41ff79f. Run 37097418040 reached onboarding, but its first tap was swallowed by the emulator; an idempotent retry is implemented. Current-source Android build/E2E is pending. Local Gradle cannot fetch Google's SDK manifests; project build inputs remain unchanged.
 
 ### P1-T13 — iOS build and boot
 

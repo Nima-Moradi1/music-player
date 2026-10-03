@@ -10,6 +10,10 @@ final class NativeAudio: NSObject {
   private var title = ""
   private var artist = ""
   private var observers: [NSObjectProtocol] = []
+  private var sleepTask: DispatchWorkItem?
+  private var repeatStartMs = -1.0
+  private var repeatEndMs = -1.0
+  private var repeatObserver: Any?
 
   @objc static func requiresMainQueueSetup() -> Bool { true }
 
@@ -42,6 +46,8 @@ final class NativeAudio: NSObject {
   }
 
   deinit {
+    sleepTask?.cancel()
+    if let repeatObserver, let player { player.removeTimeObserver(repeatObserver) }
     observers.forEach(NotificationCenter.default.removeObserver)
     MPRemoteCommandCenter.shared().playCommand.removeTarget(nil)
     MPRemoteCommandCenter.shared().pauseCommand.removeTarget(nil)
@@ -71,8 +77,16 @@ final class NativeAudio: NSObject {
     do {
       try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
       try AVAudioSession.sharedInstance().setActive(true)
+      if let repeatObserver, let player { player.removeTimeObserver(repeatObserver) }
       player?.pause()
       player = AVPlayer(url: file)
+      repeatStartMs = -1
+      repeatEndMs = -1
+      repeatObserver = player?.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.1, preferredTimescale: 1000), queue: .main) { [weak self] time in
+        guard let self, self.repeatStartMs >= 0, self.repeatEndMs > self.repeatStartMs,
+              time.seconds * 1000 >= self.repeatEndMs else { return }
+        self.player?.seek(to: CMTime(seconds: self.repeatStartMs / 1000, preferredTimescale: 1000))
+      }
       self.title = title
       self.artist = artist
       ended = false
@@ -88,6 +102,8 @@ final class NativeAudio: NSObject {
     player?.pause(); updateNowPlaying(); resolve(nil)
   }
   @objc func stop(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+    if let repeatObserver, let player { player.removeTimeObserver(repeatObserver) }
+    repeatObserver = nil
     player?.pause(); player = nil; updateNowPlaying(); resolve(nil)
   }
   @objc func seekTo(_ ms: Double, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
@@ -104,6 +120,25 @@ final class NativeAudio: NSObject {
   @objc func setVolume(_ value: Double, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
     guard (0...1).contains(value) else { reject("PLAYBACK_ERROR", "Invalid volume", nil); return }
     player?.volume = Float(value); resolve(nil)
+  }
+  @objc func setSleepTimer(_ seconds: Double, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+    guard seconds.isFinite, (0...86400).contains(seconds) else { reject("PLAYBACK_ERROR", "Invalid sleep timer", nil); return }
+    sleepTask?.cancel()
+    sleepTask = nil
+    if seconds > 0 {
+      let task = DispatchWorkItem { [weak self] in self?.player?.pause(); self?.updateNowPlaying(); self?.sleepTask = nil }
+      sleepTask = task
+      DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: task)
+    }
+    resolve(nil)
+  }
+  @objc func setABRepeat(_ startMs: Double, endMs: Double, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+    guard (startMs == -1 && endMs == -1) || (startMs.isFinite && endMs.isFinite && startMs >= 0 && endMs > startMs) else {
+      reject("PLAYBACK_ERROR", "Invalid A-B repeat", nil); return
+    }
+    repeatStartMs = startMs
+    repeatEndMs = endMs
+    resolve(nil)
   }
   @objc func getState(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
     let position = player?.currentTime().seconds ?? 0

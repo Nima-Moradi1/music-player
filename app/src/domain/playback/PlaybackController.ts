@@ -11,6 +11,9 @@ export type PlayerState = {
   positionMs: number;
   durationMs: number;
   queue: string[];
+  sleepUntilMs: number | null;
+  repeatStartMs: number | null;
+  repeatEndMs: number | null;
   error: string | null;
 };
 
@@ -22,6 +25,9 @@ const empty: PlayerState = {
   positionMs: 0,
   durationMs: 0,
   queue: [],
+  sleepUntilMs: null,
+  repeatStartMs: null,
+  repeatEndMs: null,
   error: null,
 };
 
@@ -78,6 +84,7 @@ export class PlaybackController {
       throw new Error('This entry has no audio file');
     }
     await this.native.load(track.managedPath, track.title, track.artist);
+    await this.native.setABRepeat(-1, -1);
     this.state.setState({
       trackId: track.id,
       title: track.title,
@@ -86,6 +93,8 @@ export class PlaybackController {
       positionMs: 0,
       durationMs: track.durationMs,
       queue: queue.includes(track.id) ? queue : [track.id, ...queue],
+      repeatStartMs: null,
+      repeatEndMs: null,
       error: null,
     });
     this.save();
@@ -128,6 +137,24 @@ export class PlaybackController {
       this.state.setState({queue: [...current.queue, track.id]});
       this.save();
     }
+  }
+
+  async setSleepTimer(minutes: number): Promise<void> {
+    if (minutes !== 0 && minutes !== 30) {
+      throw new Error('Invalid sleep timer');
+    }
+    await this.native.setSleepTimer(minutes * 60);
+    this.state.setState({sleepUntilMs: minutes ? Date.now() + minutes * 60000 : null});
+  }
+
+  async setABRepeat(startMs: number | null, endMs: number | null): Promise<void> {
+    await this.native.setABRepeat(startMs ?? -1, endMs ?? -1);
+    this.state.setState({repeatStartMs: startMs, repeatEndMs: endMs});
+  }
+
+  async markRepeatStart(ms: number): Promise<void> {
+    await this.native.setABRepeat(-1, -1);
+    this.state.setState({repeatStartMs: ms, repeatEndMs: null});
   }
 
   async seekTo(ms: number): Promise<void> {
@@ -180,6 +207,10 @@ export class PlaybackController {
         playing: native.playing,
         positionMs: native.positionMs,
         durationMs: native.durationMs || this.state.getState().durationMs,
+        sleepUntilMs:
+          (this.state.getState().sleepUntilMs ?? Infinity) <= Date.now()
+            ? null
+            : this.state.getState().sleepUntilMs,
       });
       this.save();
     } catch (error) {

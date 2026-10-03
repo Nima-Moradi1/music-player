@@ -15,6 +15,8 @@ export interface NativeAudioV1 {
   seekTo(ms: number): Promise<void>;
   setRate(rate: number): Promise<void>;
   setVolume(value: number): Promise<void>;
+  setSleepTimer(seconds: number): Promise<void>;
+  setABRepeat(startMs: number, endMs: number): Promise<void>;
   getState(): Promise<string>;
 }
 

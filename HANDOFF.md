@@ -12,19 +12,19 @@ Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS
 - Android E2E retry for transient UIAutomator dump was committed/pushed in 41ff79f.
 - Native playback foundation was committed/pushed in 19b4180: Android Media3 service; iOS AVPlayer and remote commands; player controls, mini-player, saved position and manual queue.
 - Local iOS 27 simulator Debug build succeeded for 19b4180; current-source Android build and native playback E2E remain pending.
-- Local 45 tests/17 suites, typecheck, lint and format check pass after queue and controller-test changes. Queue/test changes are uncommitted until the next commit.
+- Local 46 tests/17 suites, typecheck, lint (zero errors/eight existing warnings), format check, iOS 27 simulator Debug build and plist validation pass after native sleep timer and A–B repeat changes.
 
 ## Evidence and open gates
 
 - Phase 1: screen-reader/large-font/device matrix, Android E2E, native import/storage failure matrix and physical-device checks remain open; see `docs/phases/PHASE_01_FOUNDATION.md`.
-- Phase 2: native playback needs Android CI compilation and both-platform real-file play/seek/background tests. Native queue/system next, sleep timer, A–B repeat, shuffle/repeat, DSP, visualizer and one-hour soak remain open; see `docs/phases/PHASE_02_AUDIO.md`.
+- Phase 2: native playback needs Android CI compilation and both-platform real-file play/seek/background tests. Sleep timer and A–B repeat code exists but needs device verification. Native queue/system next, shuffle/repeat, DSP, visualizer and one-hour soak remain open; see `docs/phases/PHASE_02_AUDIO.md`.
 - Physical Android/iOS devices are unavailable in this workspace. Simulator results cannot close real-device interruption or soak gates.
 - Local Android SDK repository manifests still fail to load; pinned GitHub CI is the Android verification path.
 
 ## Resume next
 
-1. Commit/push the queue UI, controller tests and status documents.
-2. Inspect CI runs 37097418040 and the current-source run after 19b4180; fix Android compile/E2E failures and record results.
+1. Commit/push native sleep timer/A–B controls, Android E2E onboarding retry and status documents.
+2. Inspect current-source CI after the next push; fix Android compile/E2E failures and record results.
 3. Run iOS simulator smoke for current source, then import a real audio fixture and exercise play/pause/seek/background/relaunch.
 4. Implement remaining Phase 1 gates and Phase 2 tasks, with real-device evidence before marking either phase DONE.
 
