@@ -12,6 +12,7 @@ import {initializeI18n} from '../../shared/i18n';
 import {createAppState, type Services} from '../providers/Services';
 import {nativeAudio} from '../../native/NativeAudio';
 import {PlaybackController} from '../../domain/playback/PlaybackController';
+import {MMKVTelegramPolicyRepository} from '../../infrastructure/telegram/policyRepository';
 let ready: Promise<Services> | null = null;
 export function bootstrap(): Promise<Services> {
   if (ready) {
@@ -26,13 +27,14 @@ export function bootstrap(): Promise<Services> {
 async function initialize(): Promise<Services> {
   const preferences = new MMKVSettingsRepository();
   const settings = preferences.read();
+  const telegramPreferences = new MMKVTelegramPolicyRepository();
   await initializeI18n(settings.locale);
   const database = openLibraryDatabase();
   try {
     await migrate(database);
     const tracks = new SqliteTrackRepository(database);
     const bridge = managedMediaNative();
-    const state = createAppState(settings);
+    const state = createAppState(settings, telegramPreferences.read());
     const files = new NativeManagedFilesystem(bridge);
     const journal = new SqliteImportJournal(database);
     await journal.recover(files);
@@ -42,6 +44,7 @@ async function initialize(): Promise<Services> {
       tracks,
       playlists: new SqlitePlaylistRepository(database),
       preferences,
+      telegramPreferences,
       database,
       audio,
       state,

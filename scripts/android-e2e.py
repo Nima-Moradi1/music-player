@@ -40,8 +40,7 @@ class Device:
                 time.sleep(0.5)
                 continue
             launcher_anr = any(
-                node.get('package') == 'android'
-                and node.get('text', '').endswith("Launcher isn't responding")
+                "Launcher isn't responding" in node.get('text', '')
                 for node in root.iter('node')
             )
             if launcher_anr:
@@ -147,10 +146,15 @@ def import_file(device, filename, expected):
     # DocumentsUI opens in Recents; choosing Downloads also works after subsequent imports.
     tree = device.tree()
     if device.find(tree, filename) is None:
-        drawer = device.find(tree, 'Show roots')
-        if drawer is not None:
-            device.tap_node(drawer)
+        for attempt in range(3):
+            tree = device.tree()
+            if device.find(tree, filename) is not None:
+                break
+            drawer = device.find(tree, 'Show roots')
+            if drawer is not None and device.find(tree, 'Open from') is None:
+                device.tap_node(drawer)
             device.tap('Downloads')
+            time.sleep(1)
     device.tap(filename)
     device.wait(expected, prefix=True)
     device.evidence(filename.replace('.', '-') + '-result')

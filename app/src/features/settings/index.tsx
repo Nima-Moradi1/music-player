@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {RootStackParamList} from '../../app/navigation/types';
 import {Button, Page, Row, Surface, Text, Toggle} from '../../design-system';
 import {
   refreshLibrary,
@@ -13,6 +16,7 @@ export function SettingsScreen() {
   const {t} = useTranslation();
   const services = useServices();
   const settings = useSettings();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   async function measure() {
@@ -97,6 +101,15 @@ export function SettingsScreen() {
       <Surface>
         <Text kind="title">{t('privacy')}</Text>
         <Text muted>{t('privacyBody')}</Text>
+      </Surface>
+      <Surface>
+        <Text kind="title">{t('telegram')}</Text>
+        <Text muted>{t('telegramPolicyIntro')}</Text>
+        <Button
+          label={t('telegramPolicyOpen')}
+          secondary
+          onPress={() => navigation.navigate('TelegramSettings')}
+        />
       </Surface>
       {__DEV__ && (
         <Surface>

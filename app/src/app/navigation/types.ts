@@ -1,4 +1,9 @@
-export type RootStackParamList = {Main: undefined; Settings: undefined; Details: {trackId: string}};
+export type RootStackParamList = {
+  Main: undefined;
+  Settings: undefined;
+  TelegramSettings: undefined;
+  Details: {trackId: string};
+};
 export type TabParamList = {
   Home: undefined;
   Library: undefined;

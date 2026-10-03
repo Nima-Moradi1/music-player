@@ -7,10 +7,16 @@ import type {PlaylistRepository} from '../../domain/playlist';
 import type {MediaImporter} from '../../domain/import';
 import type {Database} from '../../infrastructure/database/contracts';
 import type {PlaybackController} from '../../domain/playback/PlaybackController';
+import {
+  defaultTelegramPolicy,
+  type TelegramPolicy,
+  type TelegramPolicyRepository,
+} from '../../domain/telegram/policy';
 import {i18n} from '../../shared/i18n';
 import {AppError, type ErrorCode} from '../../shared/errors';
 type AppState = {
   settings: Settings;
+  telegramPolicy: TelegramPolicy;
   libraryVersion: number;
   selectedTrackId: string | null;
   lastError: ErrorCode | null;
@@ -22,6 +28,7 @@ export type Services = {
   importer: MediaImporter;
   database: Database;
   audio: PlaybackController;
+  telegramPreferences: TelegramPolicyRepository;
   createId(): Promise<string>;
   selectFiles(): Promise<{uri: string; name: string}[]>;
   state: StoreApi<AppState>;
@@ -40,9 +47,10 @@ export function useServices(): Services {
   }
   return value;
 }
-export function createAppState(settings: Settings) {
+export function createAppState(settings: Settings, telegramPolicy?: TelegramPolicy) {
   return createStore<AppState>(() => ({
     settings,
+    telegramPolicy: telegramPolicy ?? defaultTelegramPolicy,
     libraryVersion: 0,
     selectedTrackId: null,
     lastError: null,
@@ -50,6 +58,18 @@ export function createAppState(settings: Settings) {
 }
 export function useSettings() {
   return useStore(useServices().state, state => state.settings);
+}
+export function useTelegramPolicy() {
+  return useStore(useServices().state, state => state.telegramPolicy);
+}
+export function updateTelegramPolicy(services: Services, changes: Partial<TelegramPolicy>) {
+  try {
+    const telegramPolicy = {...services.state.getState().telegramPolicy, ...changes};
+    services.telegramPreferences.write(telegramPolicy);
+    services.state.setState({telegramPolicy, lastError: null});
+  } catch {
+    services.state.setState({lastError: 'DATABASE_ERROR'});
+  }
 }
 export function useLibraryVersion() {
   return useStore(useServices().state, state => state.libraryVersion);

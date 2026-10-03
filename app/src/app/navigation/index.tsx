@@ -21,6 +21,7 @@ import {LibraryScreen} from '../../features/library';
 import {DiscoveryScreen} from '../../features/discovery';
 import {DownloadsScreen} from '../../features/downloads';
 import {SettingsScreen} from '../../features/settings';
+import {TelegramSettingsScreen} from '../../features/telegram';
 import {TrackDetailsScreen} from '../../features/player';
 import {OnboardingScreen} from '../../features/onboarding';
 import type {RootStackParamList, TabParamList} from './types';
@@ -199,6 +200,11 @@ export function AppNavigation() {
       >
         <Stack.Screen name="Main" component={MainTabs} options={{headerShown: false}} />
         <Stack.Screen name="Settings" component={SettingsScreen} options={{title: t('settings')}} />
+        <Stack.Screen
+          name="TelegramSettings"
+          component={TelegramSettingsScreen}
+          options={{title: t('telegram')}}
+        />
         <Stack.Screen
           name="Details"
           component={TrackDetailsScreen}
