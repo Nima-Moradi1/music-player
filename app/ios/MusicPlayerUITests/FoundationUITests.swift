@@ -1,6 +1,16 @@
 import XCTest
 
 final class FoundationUITests: XCTestCase {
+  private func openLibrary(_ app: XCUIApplication) {
+    let search = app.textFields["Search your library"]
+    for _ in 0..<3 {
+      if search.waitForExistence(timeout: 3) { return }
+      let library = app.descendants(matching: .any).matching(identifier: "Library").firstMatch
+      if library.exists { library.tap() }
+    }
+    XCTAssertTrue(search.waitForExistence(timeout: 10))
+  }
+
   private func openSettings(_ app: XCUIApplication) {
     for _ in 0..<3 {
       if app.staticTexts["Appearance"].waitForExistence(timeout: 3) { return }
@@ -21,9 +31,7 @@ final class FoundationUITests: XCTestCase {
     XCTAssertTrue(app.staticTexts["A little closer to the music you love."].waitForExistence(timeout: 20))
     try app.performAccessibilityAudit(for: [.hitRegion, .sufficientElementDescription, .textClipped])
 
-    let library = app.descendants(matching: .any).matching(identifier: "Library").firstMatch
-    library.tap()
-    XCTAssertTrue(app.textFields["Search your library"].waitForExistence(timeout: 15))
+    openLibrary(app)
     try app.performAccessibilityAudit(for: [.hitRegion, .sufficientElementDescription, .textClipped])
 
     openSettings(app)
@@ -40,10 +48,7 @@ final class FoundationUITests: XCTestCase {
     }
 
     XCTAssertTrue(app.staticTexts["A little closer to the music you love."].waitForExistence(timeout: 20))
-    let library = app.descendants(matching: .any).matching(identifier: "Library").firstMatch
-    XCTAssertTrue(library.waitForExistence(timeout: 10))
-    library.tap()
-    XCTAssertTrue(app.textFields["Search your library"].waitForExistence(timeout: 15))
+    openLibrary(app)
 
     openSettings(app)
   }
