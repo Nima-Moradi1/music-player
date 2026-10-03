@@ -2,35 +2,33 @@
 
 Updated: 2026-10-03 Asia/Tehran
 Branch: feature/phase-01-foundation-gates
-Last commit: see `git log -1`
-Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS
+Last code commit: 3a5b19e (pushed); see `git log -1` for latest docs commit.
+Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS; Phase 3 foundation IN PROGRESS.
 
 ## Current state
 
-- RN 0.87.1 offline library, managed imports, SQLite/MMKV and EN/FA UI remain intact.
-- JavaScript CI passed on 41ff79f and aa08b05. Run 37097418040 Android E2E failed after an emulator-swallowed onboarding tap; retries are pushed. Run 37098359433 is building native source; newer commits are queued.
-- Native playback commits 19b4180, f18bda7 and aa08b05 are pushed: Android Media3 service; iOS AVPlayer/system controls; player/mini-player, saved position/manual queue, native sleep timer and A–B repeat.
-- Local iOS 27 simulator Debug build succeeds including native timer/repeat and main-queue bridge changes. Current-source Android build and native playback E2E remain pending.
-- Local 47 tests/17 suites, typecheck, lint (zero errors/eight existing warnings), format check, iOS 27 simulator Debug build and plist validation pass. End-of-queue replay now restarts from zero.
+- RN 0.87.1 offline library, managed imports, SQLite/MMKV, EN/FA UI and native Android Media3/iOS AVPlayer playback are implemented. Player has saved position/manual queue, native sleep timer and A–B repeat. Device playback matrix remains unverified.
+- Telegram preferences are reachable from Settings and persist explicit source, transfer and consent choices. Consent defaults off. Connection is honestly unavailable. Typed, bounded Main/Archive scanner core and SQLite cursors are implemented and tested, but there is no TDLib bridge, login, download or sync.
+- Local verification on 2026-10-03: 51 tests/20 suites, typecheck, lint (0 errors, eight existing warnings), format check, Python compile and diff check pass.
+- CI run 37098359433 passed JavaScript and Android `assembleDebug testDebugUnitTest` on native audio source. Android E2E passed onboarding/tab navigation, then stalled in DocumentsUI while Pixel Launcher showed an ANR. Picker/ANR retry was pushed in 3a5b19e; current commit rerun pending. iOS CI was still in progress when recorded. Local iOS 27 simulator Debug build and three navigation/accessibility/Persian UI tests had passed before this Telegram UI change.
 
-## Evidence and open gates
+## Open gates
 
-- Phase 1: screen-reader/large-font/device matrix, Android E2E, native import/storage failure matrix and physical-device checks remain open; see `docs/phases/PHASE_01_FOUNDATION.md`.
-- Phase 2: native playback needs Android CI compilation and both-platform real-file play/seek/background tests. Sleep timer and A–B repeat code exists but needs device verification. Native queue/system next, shuffle/repeat, DSP, visualizer and one-hour soak remain open; see `docs/phases/PHASE_02_AUDIO.md`.
-- Physical Android/iOS devices are unavailable in this workspace. Simulator results cannot close real-device interruption or soak gates.
-- Local Android SDK repository manifests still fail to load; pinned GitHub CI is the Android verification path.
-- Current local iOS smoke passes after the bounded Settings retry: 3 UI tests, zero failures, app process survived. Playback with a real imported file was not covered by those tests.
+- Phase 1: Android end-to-end import, native import/storage failure matrix, larger-text/screen-reader and physical-device audits. See `docs/phases/PHASE_01_FOUNDATION.md`.
+- Phase 2: real-file playback/seek/background, system next/previous/native queue, DSP/visualizer, interruption matrix and one-hour soak. See `docs/phases/PHASE_02_AUDIO.md`.
+- Phase 3: app-specific Telegram API ID/hash, TDLib Android/iOS packaging, secure key/auth, download/import integration, new-message sync, dedicated-account tests and current terms review. See `docs/phases/PHASE_03_TELEGRAM.md`. Never put credentials in Git.
+- Physical Android/iOS devices are unavailable in this workspace. Local Android Gradle SDK manifests fail to load; pinned GitHub CI is the Android build path.
 
 ## Resume next
 
-1. Inspect the latest CI run after it starts; fix Android compile/E2E failures and record results.
-2. Import a real audio fixture on iOS and exercise play/pause/seek/background/relaunch.
-3. Implement remaining Phase 1 gates and Phase 2 tasks, with real-device evidence before marking either phase DONE.
+1. Inspect CI for 3a5b19e and fix remaining Android E2E picker failures. Verify iOS build after Telegram navigation change.
+2. Exercise real imported audio on iOS simulator and Android emulator; implement native queue/system controls and remaining player UI.
+3. Obtain app-specific Telegram credentials, package TDLib and connect auth/scanner/download pipeline. Scanner currently has no native client and must not be represented as functional Telegram import.
+4. Keep phase/status evidence current and push meaningful commits.
 
 ## Important files
 
 - `docs/IMPLEMENTATION_SPEC.md` — requirements and gates.
-- `docs/phases/PHASE_01_FOUNDATION.md`, `docs/phases/PHASE_02_AUDIO.md` — task evidence.
-- `app/src/domain/playback/PlaybackController.ts`, `app/src/native/NativeAudio.ts` — shared playback.
-- `app/android/app/src/main/java/com/musicplayer/media/PlaybackService.kt` — Android service.
-- `app/ios/MusicPlayer/NativeAudio.swift` — iOS engine and system controls.
+- `app/src/domain/telegram/`, `app/src/infrastructure/telegram/`, `app/src/features/telegram/` — Phase 3 foundation.
+- `app/src/domain/playback/PlaybackController.ts`, `app/src/native/NativeAudio.ts` — playback interface.
+- `app/android/app/src/main/java/com/musicplayer/media/PlaybackService.kt`, `app/ios/MusicPlayer/NativeAudio.swift` — native engines.

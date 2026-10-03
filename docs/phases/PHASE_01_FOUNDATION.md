@@ -54,7 +54,7 @@ Acceptance:
 
 Tests:
 
-- 2026-10-03 local: 45 tests/17 suites, typecheck, format and lint pass; eight existing dynamic-style lint warnings. JavaScript CI passed on commit 41ff79f (run 37097418040). Native lanes for current audio source are pending.
+- 2026-10-03 local: 51 tests/20 suites, typecheck, format and lint pass; eight existing dynamic-style lint warnings. JavaScript CI passed on aa08b05 (run 37098359433); that run also passed Android `assembleDebug testDebugUnitTest`. iOS CI for the current audio source was still running when recorded.
 
 ### P1-T05 — Domain contracts
 
@@ -158,7 +158,7 @@ Acceptance:
 
 Tests:
 
-- Java 21/SDK 37; x86_64 API 36.0 emulator. Feature CI run 37046205237 passed `assembleDebug testDebugUnitTest`. Run 37058805923 booted the app, but UIAutomator returned a malformed transient dump at onboarding; retry is committed in 41ff79f. Run 37097418040 reached onboarding, but its first tap was swallowed by the emulator; an idempotent retry is implemented. Current-source Android build/E2E is pending. Local Gradle cannot fetch Google's SDK manifests; project build inputs remain unchanged.
+- Java 21/SDK 37; x86_64 API 36.0 emulator. CI run 37098359433 passed current-source `assembleDebug testDebugUnitTest`. Android E2E reached DocumentsUI after onboarding and tab navigation, then timed out waiting for the file while Pixel Launcher displayed an ANR. Picker retry/ANR handling is pushed in 3a5b19e; rerun pending. Local Gradle cannot fetch Google's SDK manifests; project build inputs remain unchanged.
 
 ### P1-T13 — iOS build and boot
 

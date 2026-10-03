@@ -9,7 +9,7 @@ Gate: all mandatory tasks and real-device exit criteria must pass. Phase 1 gate 
 Status: IN PROGRESS
 Files: `PlaybackService.kt`, `NativeAudioModule.kt`, manifest, Gradle.
 Implemented: Media3 1.11.1 ExoPlayer in `MediaSessionService`, session notification path, audio-focus/noisy handling, background playback service declaration, private managed-file validation and typed React Native bridge for load/play/pause/stop/seek/rate/volume/state.
-Evidence: source reviewed; current-source Android CI build/E2E pending.
+Evidence: CI run 37098359433 passed `assembleDebug testDebugUnitTest` with the current native audio source. Emulator E2E failed later in the system picker during a Pixel Launcher ANR; this does not verify playback. The E2E retry is pushed in 3a5b19e.
 Open: native queue and remote next/previous, device focus/routes/lock screen verification, playback errors/events and lifecycle stress.
 
 ### P2-T02 — iOS playback service
@@ -25,7 +25,7 @@ Open: native queue, richer interruption/resume handling and real-device backgrou
 Status: IN PROGRESS
 Files: `PlaybackController.ts`, `NativeAudio.ts`, bootstrap.
 Implemented: persisted track/position/manual queue in MMKV; paused restore after relaunch; native position polling; completion advances queue; fixtures without audio cannot play.
-Evidence: 4 focused controller tests for paused restore, queue completion, native timer delegation and final-song replay; full JavaScript suite 47 tests/17 suites passed locally.
+Evidence: 4 focused controller tests for paused restore, queue completion, native timer delegation and final-song replay; full JavaScript suite 51 tests/20 suites passed locally on 2026-10-03.
 Open: native-owned queue, shuffle/repeat, completion threshold, crash and process-death matrix, system-control event synchronization.
 
 ### P2-T04 — Player experience
