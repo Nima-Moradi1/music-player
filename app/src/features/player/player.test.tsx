@@ -58,7 +58,7 @@ it('persists corrections on only the selected track and confirms durable playlis
   await waitFor(() => expect(screen.getByText('Added to Quiet collection')).toBeOnTheScreen());
   expect((await playlists.tracks('quiet')).map(track => track.id)).toEqual([selected.id]);
   expect(
-    screen.getByText('Playback arrives in Phase 2. Your local library is ready to organize.'),
+    screen.getByText('Development metadata only. These entries contain no audio and cannot play.'),
   ).toBeOnTheScreen();
   screen.unmount();
   database.close();

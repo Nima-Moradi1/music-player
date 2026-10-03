@@ -6,6 +6,7 @@ import type {TrackRepository} from '../../domain/track';
 import type {PlaylistRepository} from '../../domain/playlist';
 import type {MediaImporter} from '../../domain/import';
 import type {Database} from '../../infrastructure/database/contracts';
+import type {PlaybackController} from '../../domain/playback/PlaybackController';
 import {i18n} from '../../shared/i18n';
 import {AppError, type ErrorCode} from '../../shared/errors';
 type AppState = {
@@ -20,6 +21,7 @@ export type Services = {
   preferences: SettingsRepository;
   importer: MediaImporter;
   database: Database;
+  audio: PlaybackController;
   createId(): Promise<string>;
   selectFiles(): Promise<{uri: string; name: string}[]>;
   state: StoreApi<AppState>;

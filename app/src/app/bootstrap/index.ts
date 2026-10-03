@@ -10,6 +10,8 @@ import {SqliteImportJournal} from '../../infrastructure/database/importJournal';
 import {ImportMedia} from '../../domain/import/importMedia';
 import {initializeI18n} from '../../shared/i18n';
 import {createAppState, type Services} from '../providers/Services';
+import {nativeAudio} from '../../native/NativeAudio';
+import {PlaybackController} from '../../domain/playback/PlaybackController';
 let ready: Promise<Services> | null = null;
 export function bootstrap(): Promise<Services> {
   if (ready) {
@@ -34,11 +36,14 @@ async function initialize(): Promise<Services> {
     const files = new NativeManagedFilesystem(bridge);
     const journal = new SqliteImportJournal(database);
     await journal.recover(files);
+    const audio = new PlaybackController(nativeAudio(), tracks);
+    await audio.restore();
     return {
       tracks,
       playlists: new SqlitePlaylistRepository(database),
       preferences,
       database,
+      audio,
       state,
       createId: () => bridge.createId(),
       selectFiles: selectAudioFiles,

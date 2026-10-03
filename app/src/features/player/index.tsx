@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {StyleSheet} from 'react-native';
+import {useStore} from 'zustand';
 import {useTranslation} from 'react-i18next';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {
@@ -17,6 +18,83 @@ import {refreshLibrary, useLibraryVersion, useServices} from '../../app/provider
 import type {RootStackParamList} from '../../app/navigation/types';
 import type {Track, Language} from '../../domain/track';
 import type {Playlist} from '../../domain/playlist';
+import type {PlaybackController} from '../../domain/playback/PlaybackController';
+
+function clock(ms: number) {
+  return `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
+}
+
+function PlayerControls({audio, track}: {audio: PlaybackController; track: Track}) {
+  const {t} = useTranslation();
+  const playback = useStore(audio.state);
+  const active = playback.trackId === track.id;
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState(false);
+  async function action(work: () => Promise<void>) {
+    if (pending) {
+      return;
+    }
+    setPending(true);
+    setError(false);
+    try {
+      await work();
+    } catch {
+      setError(true);
+    } finally {
+      setPending(false);
+    }
+  }
+  return (
+    <Surface variant="player">
+      <Text kind="title">{t('nowPlaying')}</Text>
+      <Text muted accessibilityLiveRegion="polite">
+        {active
+          ? `${clock(playback.positionMs)} / ${clock(playback.durationMs)}`
+          : clock(track.durationMs)}
+      </Text>
+      <Row>
+        <Button
+          label={active && playback.playing ? t('pause') : t('play')}
+          disabled={pending}
+          onPress={() => {
+            void action(() => (active ? audio.toggle() : audio.playTrack(track)));
+          }}
+        />
+        {active && (
+          <Button
+            label={t('backTen')}
+            secondary
+            disabled={pending}
+            onPress={() => {
+              void action(() => audio.seekTo(playback.positionMs - 10000));
+            }}
+          />
+        )}
+      </Row>
+      {active && (
+        <Row>
+          <Button
+            label={t('forwardTen')}
+            secondary
+            disabled={pending}
+            onPress={() => {
+              void action(() => audio.seekTo(playback.positionMs + 10000));
+            }}
+          />
+          <Button
+            label={t('nextTrack')}
+            secondary
+            disabled={pending || playback.queue.indexOf(track.id) >= playback.queue.length - 1}
+            onPress={() => {
+              void action(() => audio.next());
+            }}
+          />
+        </Row>
+      )}
+      {error && <Text accessibilityLiveRegion="polite">{t('playbackFailed')}</Text>}
+    </Surface>
+  );
+}
 export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackParamList, 'Details'>) {
   const services = useServices();
   const {t} = useTranslation();
@@ -94,9 +172,13 @@ export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackPara
       <Artwork seed={track.id} uri={track.artworkPath} large />
       <Text kind="heading">{track.title}</Text>
       <Text muted>{track.artist || t('unknownArtist')}</Text>
-      <Surface>
-        <Text>{t('phase2')}</Text>
-      </Surface>
+      {track.managedPath && services.audio ? (
+        <PlayerControls audio={services.audio} track={track} />
+      ) : (
+        <Surface>
+          <Text>{track.managedPath ? t('playbackFailed') : t('fixtureBody')}</Text>
+        </Surface>
+      )}
       {error && (
         <>
           <Text accessibilityLiveRegion="polite">{t('actionFailed')}</Text>

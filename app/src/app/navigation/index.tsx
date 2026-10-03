@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {useStore} from 'zustand';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {
   NavigationContainer,
@@ -23,6 +24,7 @@ import {SettingsScreen} from '../../features/settings';
 import {TrackDetailsScreen} from '../../features/player';
 import {OnboardingScreen} from '../../features/onboarding';
 import type {RootStackParamList, TabParamList} from './types';
+import type {PlaybackController} from '../../domain/playback/PlaybackController';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tabs = createBottomTabNavigator<TabParamList>();
 const icons: Record<keyof TabParamList, IconName> = {
@@ -31,6 +33,38 @@ const icons: Record<keyof TabParamList, IconName> = {
   Discover: 'discover',
   Downloads: 'downloads',
 };
+function MiniPlayer({audio, open}: {audio: PlaybackController; open: (trackId: string) => void}) {
+  const playback = useStore(audio.state);
+  const {t} = useTranslation();
+  if (!playback.trackId) {
+    return null;
+  }
+  return (
+    <Row style={styles.preview}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${t('nowPlaying')}: ${playback.title}`}
+        onPress={() => open(playback.trackId!)}
+        style={styles.fill}
+      >
+        <Text numberOfLines={1}>{playback.title}</Text>
+        <Text kind="caption" muted numberOfLines={1}>
+          {playback.artist}
+        </Text>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t(playback.playing ? 'pause' : 'play')}
+        onPress={() => {
+          void audio.toggle().catch(() => undefined);
+        }}
+        style={styles.miniControl}
+      >
+        <Text>{playback.playing ? 'Ⅱ' : '▶'}</Text>
+      </Pressable>
+    </Row>
+  );
+}
 function TabBar({state, navigation}: BottomTabBarProps) {
   const {colors, rtl} = useTheme();
   const {t} = useTranslation();
@@ -66,7 +100,10 @@ function TabBar({state, navigation}: BottomTabBarProps) {
         },
       ]}
     >
-      {!!trackId && (
+      {services.audio && (
+        <MiniPlayer audio={services.audio} open={id => root.navigate('Details', {trackId: id})} />
+      )}
+      {!!trackId && !services.audio && (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('trackDetails')}
@@ -182,5 +219,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   preview: {padding: tokens.spacing.md, minHeight: tokens.size.touch},
+  miniControl: {
+    minWidth: tokens.size.touch,
+    minHeight: tokens.size.touch,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   fill: {flex: 1},
 });

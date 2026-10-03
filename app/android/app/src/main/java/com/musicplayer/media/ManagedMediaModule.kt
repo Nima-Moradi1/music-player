@@ -145,7 +145,7 @@ class ManagedMediaModule(private val context: ReactApplicationContext) : ReactCo
 }
 
 class ManagedMediaPackage : ReactPackage {
-  override fun createNativeModules(context: ReactApplicationContext): List<NativeModule> = listOf(ManagedMediaModule(context), HapticsModule(context))
+  override fun createNativeModules(context: ReactApplicationContext): List<NativeModule> = listOf(ManagedMediaModule(context), HapticsModule(context), NativeAudioModule(context))
   override fun createViewManagers(context: ReactApplicationContext): List<ViewManager<*, *>> = emptyList()
 }
 
