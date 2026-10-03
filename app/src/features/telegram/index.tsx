@@ -5,7 +5,7 @@ import {updateTelegramPolicy, useServices, useTelegramPolicy} from '../../app/pr
 import type {TelegramPolicy} from '../../domain/telegram/policy';
 
 const sourceKeys = ['savedMessages', 'privateChats', 'channels', 'groups'] as const;
-const transferKeys = ['autoImport', 'wifiOnly'] as const;
+const transferKeys = ['autoImport', 'wifiOnly', 'paused'] as const;
 
 export function TelegramSettingsScreen() {
   const {t} = useTranslation();
@@ -43,6 +43,7 @@ export function TelegramSettingsScreen() {
           />
         ))}
         <Text muted>{t('telegramMaxFile')}</Text>
+        <Text muted>{t('telegramStorageCap')}</Text>
       </Surface>
       <Surface>
         <Text kind="title">{t('telegramConsentTitle')}</Text>

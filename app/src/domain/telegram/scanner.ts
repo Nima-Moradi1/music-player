@@ -14,8 +14,8 @@ export interface TelegramScanClient {
   history(chatId: string, fromMessageId: string | null, limit: number): Promise<TelegramMessage[]>;
 }
 export interface TelegramCursorStore {
-  read(chatId: string): Promise<string | null>;
-  write(chat: TelegramChat, messageId: string): Promise<void>;
+  read(chatId: string): Promise<{newest: string; backfill: string | null} | null>;
+  commit(chat: TelegramChat, newest: string, backfill: string | null): Promise<void>;
 }
 export type TelegramCandidate = TelegramMessage & {file: TelegramFile};
 
@@ -52,7 +52,7 @@ export async function scanTelegramHistory({
   maxPages?: number;
 }): Promise<{chats: number; messages: number; candidates: number}> {
   const counts = {chats: 0, messages: 0, candidates: 0};
-  if (!policy.consent || maxPages < 1 || maxPages > 1000) {
+  if (!policy.consent || policy.paused || maxPages < 1 || maxPages > 1000) {
     return counts;
   }
   let pages = 0;
@@ -63,14 +63,69 @@ export async function scanTelegramHistory({
       pages++;
       for (const chat of chats) {
         if (signal?.aborted) return counts;
-        if (!policy[chat.kind]) continue;
+        if (!policy[chat.kind] || policy.excludedChatIds.includes(chat.id)) continue;
         counts.chats++;
-        let from = await cursors.read(chat.id);
+        const cursor = await cursors.read(chat.id);
+        let newest = cursor?.newest ?? null;
+        let from: string | null = null;
+        let reachedNewest = false;
+        let latestSeen: string | null = null;
+        let initialBackfill: string | null = null;
+        // Reconcile messages that arrived since the last scan before continuing
+        // an older, paginated backfill. TDLib history is newest first.
         while (pages < maxPages) {
           if (signal?.aborted) return counts;
           const messages = await client.history(chat.id, from, 50);
           pages++;
-          if (messages.length === 0) break;
+          if (messages.length === 0) {
+            reachedNewest = true;
+            break;
+          }
+          const pageNewest = messages[0]?.id;
+          latestSeen ??= pageNewest ?? null;
+          let lastId: string | null = null;
+          for (const message of messages) {
+            if (signal?.aborted) return counts;
+            if (message.chatId !== chat.id || !message.id) continue;
+            if (message.id === newest) {
+              reachedNewest = true;
+              break;
+            }
+            if (eligibleFile(message, policy)) {
+              await onCandidate(message);
+              counts.candidates++;
+            }
+            lastId = message.id;
+            counts.messages++;
+          }
+          if (!newest && pageNewest && lastId) {
+            newest = pageNewest;
+            initialBackfill = messages.length === 50 ? lastId : null;
+            // Persist both positions together so a crash cannot skip older pages.
+            await cursors.commit(chat, newest, initialBackfill);
+            reachedNewest = true;
+            break;
+          }
+          if (reachedNewest || messages.length < 50) {
+            if (lastId && latestSeen && newest) {
+              await cursors.commit(chat, latestSeen, cursor?.backfill ?? null);
+              newest = latestSeen;
+            }
+            reachedNewest = true;
+            break;
+          }
+          from = lastId;
+          if (!from) break;
+        }
+        if (!reachedNewest || !newest) continue;
+        // On a first scan, continue from the first committed page. On later
+        // scans, the saved backfill position is independent of new messages.
+        let backfill = cursor?.backfill ?? initialBackfill;
+        while (backfill && pages < maxPages) {
+          if (signal?.aborted) return counts;
+          const messages = await client.history(chat.id, backfill, 50);
+          pages++;
+          let lastId: string | null = null;
           for (const message of messages) {
             if (signal?.aborted) return counts;
             if (message.chatId !== chat.id || !message.id) continue;
@@ -78,11 +133,11 @@ export async function scanTelegramHistory({
               await onCandidate(message);
               counts.candidates++;
             }
-            await cursors.write(chat, message.id);
-            from = message.id;
+            lastId = message.id;
             counts.messages++;
           }
-          if (messages.length < 50) break;
+          backfill = messages.length === 50 ? lastId : null;
+          await cursors.commit(chat, newest, backfill);
         }
       }
       if (chats.length < 50) break;

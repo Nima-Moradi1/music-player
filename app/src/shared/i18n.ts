@@ -56,7 +56,9 @@ export const en = {
   telegramTransfer: 'Transfers',
   autoImport: 'Automatically import new music',
   wifiOnly: 'Download on Wi-Fi only',
+  paused: 'Pause Telegram imports',
   telegramMaxFile: 'Maximum file size: 512 MB',
+  telegramStorageCap: 'Telegram storage limit: 2 GB',
   telegramConsentTitle: 'Your choice',
   telegramConsentBody:
     'You can change these choices at any time. No Telegram data is accessed until you connect your account.',
@@ -244,7 +246,9 @@ export const fa: typeof en = {
   telegramTransfer: 'انتقال فایل',
   autoImport: 'ورود خودکار موسیقی جدید',
   wifiOnly: 'دانلود فقط با وای‌فای',
+  paused: 'توقف موقت ورود موسیقی از تلگرام',
   telegramMaxFile: 'حداکثر اندازه فایل: ۵۱۲ مگابایت',
+  telegramStorageCap: 'سقف فضای تلگرام: ۲ گیگابایت',
   telegramConsentTitle: 'انتخاب شما',
   telegramConsentBody:
     'هر زمان می‌توانید این گزینه‌ها را تغییر دهید. تا زمانی که به حساب خود متصل نشوید، داده‌ای از تلگرام خوانده نمی‌شود.',

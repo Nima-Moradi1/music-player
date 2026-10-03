@@ -33,24 +33,24 @@ Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/
 ## Phase 3 — Telegram
 
 - [!] P3-T01 Own API credentials, native TDLib packaging, secure keys and auth; credentials and native integration unavailable.
-- [~] P3-T02 Persisted opt-in consent, source and network policy UI with honest unavailable connection state; auth and native execution pending.
-- [~] P3-T03 Bounded Main/Archive history scanner core, candidate validation, cancellation and SQLite cursors tested; TDLib adapter/new-message reconciliation/retries pending.
-- [ ] P3-T04 Bounded downloads, validation, provenance/hash dedupe and atomic import.
-- [ ] P3-T05 New-message sync, exclusions, pause/disconnect and local retention.
+- [~] P3-T02 Persisted opt-in consent, source, network, pause, exclusion and storage policy with honest unavailable connection state; auth and native execution pending.
+- [~] P3-T03 Bounded Main/Archive scanner now reconciles new messages and resumes older backfill with transactional SQLite cursors; TDLib adapter/retries/device evidence pending.
+- [~] P3-T04 Policy-gated transfer/import core reuses atomic managed import, hash dedupe and Telegram provenance with temp cleanup; TDLib transfer/scheduler/progress UI pending.
+- [~] P3-T05 Persisted pause/exclusion gates and later-scan new-message reconciliation; TDLib updates, disconnect and retention tests pending.
 - [ ] P3-T06 Dedicated-account Android/iOS tests and current terms compliance gate.
 
 ## Phase 4 — Advanced experience
 
 - [~] P4-T01 Local user-supplied plain/LRC lyrics, SQLite cache, active line and offset UI; embedded/provider lyrics and licensing gate pending.
 - [~] P4-T02 Bounded on-device artist/genre/album recommendations with Persian locale tie preference and reasons; provider adapters pending.
-- [ ] P4-T03 Only licensed downloads, native resilience and shared import pipeline.
+- [~] P4-T03 Disabled licensed-provider/transfer contract and rights/URL/storage gates reuse managed import; approved provider, native transfer and UI pending.
 - [ ] P4-T04 Android widget and iOS WidgetKit/App Intents.
 - [ ] P4-T05 Advanced EQ/gestures/visuals and responsive accessibility/performance.
 
 ## Phase 5 — Release
 
-- [ ] P5-T01 Recovery, storage, migrations, backup/restore and offline/security audit.
-- [ ] P5-T02 License/SBOM, privacy, provider/Telegram terms and localization audit.
+- [~] P5-T01 Source recovery/storage audit recorded; export/restore, corruption and native failure gates pending.
+- [~] P5-T02 Initial privacy/source audit and unused iOS location-purpose cleanup; dependency/license, terms and localization gates pending.
 - [ ] P5-T03 Device performance, battery/thermal/memory, 24h playback and upgrade tests.
 - [ ] P5-T04 Native/E2E/release CI, versioning, signing and smoke tests.
 - [ ] P5-T05 Verified Android AAB/APK and iOS archive/TestFlight guides and artifacts.

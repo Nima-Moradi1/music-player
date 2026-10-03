@@ -8,12 +8,20 @@ export const telegramPolicySchema = z.object({
   channels: z.boolean(),
   groups: z.boolean(),
   autoImport: z.boolean(),
+  paused: z.boolean().default(false),
+  excludedChatIds: z.array(z.string()).max(1000).default([]),
   wifiOnly: z.boolean(),
   maxFileBytes: z
     .number()
     .int()
     .positive()
     .max(1024 * 1024 * 1024),
+  maxStorageBytes: z
+    .number()
+    .int()
+    .positive()
+    .max(100 * 1024 * 1024 * 1024)
+    .default(2 * 1024 * 1024 * 1024),
 });
 export type TelegramPolicy = z.infer<typeof telegramPolicySchema>;
 export const defaultTelegramPolicy: TelegramPolicy = {
@@ -24,8 +32,11 @@ export const defaultTelegramPolicy: TelegramPolicy = {
   channels: true,
   groups: false,
   autoImport: true,
+  paused: false,
+  excludedChatIds: [],
   wifiOnly: true,
   maxFileBytes: 512 * 1024 * 1024,
+  maxStorageBytes: 2 * 1024 * 1024 * 1024,
 };
 export function parseTelegramPolicy(value: unknown): TelegramPolicy {
   const result = telegramPolicySchema.safeParse(value);

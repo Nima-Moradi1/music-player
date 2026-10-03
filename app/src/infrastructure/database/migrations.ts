@@ -47,6 +47,10 @@ export const migrations = [
     version: 2,
     statements: ['ALTER TABLE import_items ADD COLUMN content_hash TEXT'],
   },
+  {
+    version: 3,
+    statements: ['ALTER TABLE telegram_scan_cursors ADD COLUMN backfill_message_id TEXT'],
+  },
 ] as const;
 
 export async function migrate(database: Database): Promise<void> {

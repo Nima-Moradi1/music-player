@@ -41,7 +41,7 @@ it('requires consent, scans both folders, and stores the full message id only af
   };
   const cursors = {
     read: jest.fn(async () => null),
-    write: jest.fn(async (_chat, id: string) => {
+    commit: jest.fn(async (_chat, id: string) => {
       events.push(`cursor:${id}`);
     }),
   };
@@ -60,4 +60,42 @@ it('requires consent, scans both folders, and stores the full message id only af
   expect(result).toEqual({chats: 1, messages: 1, candidates: 1});
   expect(client.listChats).toHaveBeenCalledWith('archive', 0, 50);
   expect(events).toEqual(['import', `cursor:${music.id}`]);
+});
+
+it('resumes older pages and imports newly arrived messages without replaying the cursor', async () => {
+  const messages = Array.from({length: 51}, (_, index) => ({
+    ...music,
+    id: String(100 - index),
+  }));
+  let cursor: {newest: string; backfill: string | null} | null = null;
+  const imported: string[] = [];
+  const client = {
+    listChats: async (folder: 'main' | 'archive') => (folder === 'main' ? [chat] : []),
+    history: async (_chatId: string, from: string | null, limit: number) => {
+      const start = from ? messages.findIndex(message => message.id === from) + 1 : 0;
+      return messages.slice(start, start + limit);
+    },
+  };
+  const cursors = {
+    read: async () => cursor,
+    commit: async (_chat: TelegramChat, newest: string, backfill: string | null) => {
+      cursor = {newest, backfill};
+    },
+  };
+  const args = {
+    client,
+    cursors,
+    policy: {...defaultTelegramPolicy, consent: true},
+    onCandidate: async (message: TelegramMessage) => {
+      imported.push(message.id);
+    },
+  };
+  await scanTelegramHistory(args);
+  expect(imported).toHaveLength(51);
+  expect(cursor).toEqual({newest: '100', backfill: null});
+  messages.unshift({...music, id: '101'});
+  await scanTelegramHistory(args);
+  expect(imported).toHaveLength(52);
+  expect(imported.at(-1)).toBe('101');
+  expect(cursor).toEqual({newest: '101', backfill: null});
 });

@@ -1,0 +1,14 @@
+# Release readiness (2026-10-03)
+
+This is a source audit, not release certification. No signed Android/iOS artifact or physical-device release pass has been produced.
+
+| Gate                       | Current evidence                                                                                                                                       | Remaining work                                                                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Recovery/storage           | Transactional SQLite migrations, import journal recovery, atomic managed import and orphan cleanup are implemented. Android system backup is disabled. | Native process-death and low-storage matrix; corruption recovery; user-controlled export/restore with audio and settings; upgrade tests. |
+| Privacy/security           | Local library, explicit Telegram consent, no connected Telegram or download provider; unused empty iOS location purpose string removed.                | Review complete data flows, dependencies/SBOM, privacy manifest and store declarations; secure TDLib key storage if Telegram is enabled. |
+| Rights/terms               | No online lyrics or download provider is enabled.                                                                                                      | Verify each provider license and current Telegram terms before activation; retain review evidence and product disclosures.               |
+| Localization/accessibility | EN/FA and RTL foundations and iOS simulator smoke exist.                                                                                               | Screen-reader, large text, physical-device and full translation audits.                                                                  |
+| Performance                | 10k local-library query evidence is in `docs/qa/PERFORMANCE.md`.                                                                                       | Release-build startup, frame, memory, battery/thermal, 24-hour playback and upgrade measurements on Android/iOS devices.                 |
+| CI/release                 | JavaScript quality, Android debug/native tests/E2E and iOS simulator build/smoke are configured.                                                       | Release builds, signing, version automation, device smoke, signed AAB/APK and iOS archive/TestFlight.                                    |
+
+Do not mark Phase 5 complete or distribute until all applicable gates above pass. Use `ANDROID.md` and `IOS.md` for the current project configuration and remaining export steps.

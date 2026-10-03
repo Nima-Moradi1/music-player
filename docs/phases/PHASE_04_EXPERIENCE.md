@@ -20,8 +20,9 @@ Open: licensed provider adapters, wider-library paging and recommendation qualit
 
 ### P4-T03 — Permitted downloads
 
-Status: TODO
-Open: approved provider contract, legal capability and rights gate, resilient native transfer and validated managed import. No provider is enabled.
+Status: IN PROGRESS
+Implemented: a disabled-by-default licensed offer/provider/transfer contract verifies offline-copy rights, provider identity, file bounds, short-lived HTTPS URL, free space and cancellation. It reuses managed import for validation, hash dedupe and `app_download` provenance, then cleans up adapter-owned temporary files.
+Open: approved provider and rights review, resilient native transfer and UI/progress states. No provider is enabled.
 
 ### P4-T04 — Widgets and system surfaces
 

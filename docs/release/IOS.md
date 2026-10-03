@@ -43,7 +43,7 @@ From the repository root, `pnpm ios` starts the selected simulator; run Metro wi
 
 ## Production gate — not completed
 
-Choose the final bundle ID and Apple Developer team, set version/build, and verify signing/capabilities on a physical device. Add background audio when Phase 2 implements the native engine. Add WidgetKit/App Intents and App Group entitlements only with the Phase 4 widget. Package TDLib only in Phase 3; no Telegram credentials are currently bundled.
+Choose the final bundle ID and Apple Developer team, set version/build, and verify signing/capabilities on a physical device. `UIBackgroundModes` already contains `audio`; verify it with real playback. Add WidgetKit/App Intents and App Group entitlements with the Phase 4 widget. Package TDLib only after Phase 3 credentials and native integration are ready; no Telegram credentials are currently bundled.
 
 Audit `PrivacyInfo.xcprivacy`, required-reason APIs from all native dependencies, usage descriptions, deep links, native library architectures and symbol archives. Build Release, test on a device, then use Xcode Product → Archive and Organizer → Distribute App → TestFlight internal testing. The archive, signing, external TestFlight and App Store submission are not verified yet.
 
