@@ -158,7 +158,7 @@ Acceptance:
 
 Tests:
 
-- Java 21/SDK 37; x86_64 API 36.0 emulator. CI run 37098359433 passed current-source `assembleDebug testDebugUnitTest`. Android E2E reached DocumentsUI after onboarding and tab navigation, then timed out waiting for the file while Pixel Launcher displayed an ANR. Picker retry/ANR handling is pushed in 3a5b19e; rerun pending. Local Gradle cannot fetch Google's SDK manifests; project build inputs remain unchanged.
+- Java 21/SDK 37; x86_64 API 36.0 emulator. CI run 37098359433 passed native build/tests. Run 37099499793 imported an MP3, then DocumentsUI could not show the FLAC fixture under its `audio/*` filter. Commit 8a096a5 allows all picker files while native validation still rejects unsupported content; current CI rerun pending. Local Gradle cannot fetch Google's SDK manifests; project build inputs remain unchanged.
 
 ### P1-T13 — iOS build and boot
 

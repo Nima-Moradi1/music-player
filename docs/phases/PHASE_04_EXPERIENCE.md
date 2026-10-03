@@ -8,7 +8,7 @@ Gate: lyrics, discovery, permitted downloads, widgets and advanced player experi
 
 Status: IN PROGRESS
 Implemented: user-supplied plain/LRC lyrics saved per track in SQLite; timestamp parsing, binary-search active line from playback clock, and ±0.5-second saved timing offset. EN/FA Lyrics screen is accessible from track details. No lyrics leave the device.
-Evidence: parser, real SQLite repository and screen tests pass in the 59-test suite; iOS 27 simulator Debug build passes.
+Evidence: parser, real SQLite repository and screen tests pass in the 59-test suite; iOS 27 simulator Debug build and three UI smoke tests pass.
 Open: native embedded lyrics extraction, approved online provider and rights gate, provider result selection, complete lyric scrolling/device accessibility checks. No external lyrics are fetched.
 
 ### P4-T02 — Discovery

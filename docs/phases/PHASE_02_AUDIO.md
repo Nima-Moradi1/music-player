@@ -17,7 +17,7 @@ Open: native queue and remote next/previous, device focus/routes/lock screen ver
 Status: IN PROGRESS
 Files: `NativeAudio.swift`, `NativeAudioBridge.m`, Info.plist, Xcode project.
 Implemented: AVPlayer, `.playback` audio session, background audio mode, Now Playing metadata, remote play/pause/seek, pause on interruptions and removed route, private managed-file validation and typed bridge. Preferred speed persists across paused play and remote play.
-Evidence: 2026-10-03 iOS 27 simulator Debug build passes with the latest Swift speed change. Earlier navigation/accessibility smoke passed (3 UI tests, zero failures). Real-file playback was not exercised by these checks.
+Evidence: 2026-10-03 iOS 27 simulator Debug build and full launch/navigation/accessibility/Persian smoke pass with the latest source (3 UI tests, zero failures). Real-file playback was not exercised by these checks.
 Open: native queue, richer interruption/resume handling and real-device background/lock screen/routes verification.
 
 ### P2-T03 — State, queue and restore
