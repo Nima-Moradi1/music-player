@@ -17,16 +17,16 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [~] P1-T11 Manual import, 10k fixture, diagnostics and functional mini-player controls; native import failure matrix remains open.
 - [~] P1-T12 Current-source Android debug build and native tests passed in CI run 37098359433. E2E reached DocumentsUI and stopped amid a Pixel Launcher ANR; retry fix pushed, rerun pending.
 - [x] P1-T13 iOS Debug build, iOS 27 simulator boot and two native UI tests pass after Pod target and scene-lifecycle fixes (2026-10-02).
-- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates; 51 JS tests and current iOS simulator navigation/accessibility/Persian audits pass (3 UI tests, zero failures); Android E2E and screen-reader evidence pending.
+- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates; 59 JS tests and earlier iOS simulator navigation/accessibility/Persian audits pass (3 UI tests, zero failures); Android E2E and screen-reader evidence pending.
 
 Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/PHASE_01_FOUNDATION.md` and `docs/qa/`. Physical-device and screen-reader gates cannot be marked complete from simulator evidence. Phase 2 implementation has begun at the user's request; its exit remains open.
 
 ## Phase 2 — Native audio
 
 - [~] P2-T01 Media3 ExoPlayer session service, foreground permission/notification path, audio focus/noisy handling and bridge implemented; current-source Android CI build passed, device playback pending.
-- [~] P2-T02 iOS AVPlayer, playback session/background mode, Now Playing, play/pause/seek remote commands and basic interruption/route handling implemented; simulator Debug build passes, playback/device matrix pending.
-- [~] P2-T03 Persisted selected track, position and manual queue with paused restore, completion advance and 1-second progress poll; two controller tests pass. Native queue/system next, lifecycle stress and crash recovery remain open.
-- [~] P2-T04 Details and mini-player play/pause, 10-second seek, manual enqueue and next controls plus native 30-minute sleep timer and A–B repeat implemented; gestures, full player UX and native/device verification remain open.
+- [~] P2-T02 iOS AVPlayer, playback session/background mode, Now Playing, play/pause/seek remote commands, preferred speed and basic interruption/route handling implemented; current simulator Debug build passes, playback/device matrix pending.
+- [~] P2-T03 Persisted selected track, position, manual queue, repeat mode and speed with paused restore, completion advance/wrap and 1-second poll; native queue/system next, shuffle, lifecycle stress and crash recovery remain open.
+- [~] P2-T04 Details and mini-player controls now include previous/next, repeat and speed alongside seek, enqueue, native sleep timer and A–B repeat; seek slider/queue sheet/gestures and device verification remain open.
 - [ ] P2-T05 Cross-platform DSP, presets, ReplayGain, artwork/Skia and visualizer.
 - [ ] P2-T06 Real-device interruption matrix, codec tests and 1h soak.
 
@@ -41,8 +41,8 @@ Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/
 
 ## Phase 4 — Advanced experience
 
-- [ ] P4-T01 Embedded/cached/provider lyrics, LRC timing, offset and licensing gate.
-- [ ] P4-T02 Artist/genre recommendations, locale priority and explanations.
+- [~] P4-T01 Local user-supplied plain/LRC lyrics, SQLite cache, active line and offset UI; embedded/provider lyrics and licensing gate pending.
+- [~] P4-T02 Bounded on-device artist/genre/album recommendations with Persian locale tie preference and reasons; provider adapters pending.
 - [ ] P4-T03 Only licensed downloads, native resilience and shared import pipeline.
 - [ ] P4-T04 Android widget and iOS WidgetKit/App Intents.
 - [ ] P4-T05 Advanced EQ/gestures/visuals and responsive accessibility/performance.

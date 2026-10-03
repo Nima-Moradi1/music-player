@@ -16,24 +16,24 @@ Open: native queue and remote next/previous, device focus/routes/lock screen ver
 
 Status: IN PROGRESS
 Files: `NativeAudio.swift`, `NativeAudioBridge.m`, Info.plist, Xcode project.
-Implemented: AVPlayer, `.playback` audio session, background audio mode, Now Playing metadata, remote play/pause/seek, pause on interruptions and removed route, private managed-file validation and typed bridge.
-Evidence: 2026-10-03 iOS 27 simulator Debug build and full navigation/accessibility smoke passed (3 UI tests, zero failures). A fresh Debug build with the Phase 3 Settings route also passes. Real-file playback was not exercised by these checks.
+Implemented: AVPlayer, `.playback` audio session, background audio mode, Now Playing metadata, remote play/pause/seek, pause on interruptions and removed route, private managed-file validation and typed bridge. Preferred speed persists across paused play and remote play.
+Evidence: 2026-10-03 iOS 27 simulator Debug build passes with the latest Swift speed change. Earlier navigation/accessibility smoke passed (3 UI tests, zero failures). Real-file playback was not exercised by these checks.
 Open: native queue, richer interruption/resume handling and real-device background/lock screen/routes verification.
 
 ### P2-T03 — State, queue and restore
 
 Status: IN PROGRESS
 Files: `PlaybackController.ts`, `NativeAudio.ts`, bootstrap.
-Implemented: persisted track/position/manual queue in MMKV; paused restore after relaunch; native position polling; completion advances queue; fixtures without audio cannot play.
-Evidence: 4 focused controller tests for paused restore, queue completion, native timer delegation and final-song replay; full JavaScript suite 51 tests/20 suites passed locally on 2026-10-03.
-Open: native-owned queue, shuffle/repeat, completion threshold, crash and process-death matrix, system-control event synchronization.
+Implemented: persisted track/position/manual queue, repeat off/one/all and playback speed in MMKV; paused restore after relaunch; native position polling; completion advances queue, repeats one or wraps all. Previous restarts the current song after three seconds or loads the prior queued song. Fixtures without audio cannot play.
+Evidence: focused controller tests and full JavaScript suite 59 tests/25 suites pass locally on 2026-10-03.
+Open: native-owned queue, shuffle, completion threshold, crash and process-death matrix, system-control next/previous synchronization.
 
 ### P2-T04 — Player experience
 
 Status: IN PROGRESS
 Files: details/player, mini-player, localization.
-Implemented: localized play/pause, 10-second seek, manual enqueue, queue count and next controls; native 30-minute sleep timer and A–B repeat with visible buttons.
-Evidence: 4 controller tests pass; iOS 27 simulator Debug build succeeds after native timer/repeat changes.
+Implemented: localized play/pause, 10-second seek, manual enqueue, queue count, next/previous, repeat mode and 1×/1.25×/1.5×/2× speed controls; native 30-minute sleep timer and A–B repeat.
+Evidence: controller tests and iOS 27 simulator Debug build pass with the latest source.
 Open: full player layout, seek slider/tooltip, queue sheet, gesture registry/customization and device playback checks.
 
 ### P2-T05 — DSP and visuals

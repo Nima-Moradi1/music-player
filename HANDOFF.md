@@ -2,33 +2,35 @@
 
 Updated: 2026-10-03 Asia/Tehran
 Branch: feature/phase-01-foundation-gates
-Last code commit: 3a5b19e (pushed); see `git log -1` for latest docs commit.
-Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS; Phase 3 foundation IN PROGRESS.
+Last code commit: d146ddf (pushed); see `git log -1` for latest docs commit.
+Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS; Phase 3 foundation IN PROGRESS; Phase 4 local features IN PROGRESS.
 
 ## Current state
 
-- RN 0.87.1 offline library, managed imports, SQLite/MMKV, EN/FA UI and native Android Media3/iOS AVPlayer playback are implemented. Player has saved position/manual queue, native sleep timer and A–B repeat. Device playback matrix remains unverified.
-- Telegram preferences are reachable from Settings and persist explicit source, transfer and consent choices. Consent defaults off. Connection is honestly unavailable. Typed, bounded Main/Archive scanner core and SQLite cursors are implemented and tested, but there is no TDLib bridge, login, download or sync.
-- Local verification on 2026-10-03: 51 tests/20 suites, typecheck, lint (0 errors, eight existing warnings), format check, Python compile and diff check pass.
-- CI run 37098359433 passed JavaScript and Android `assembleDebug testDebugUnitTest` on native audio source. Android E2E passed onboarding/tab navigation, then stalled in DocumentsUI while Pixel Launcher showed an ANR. Picker/ANR retry was pushed in 3a5b19e; current commit rerun pending. iOS CI was still in progress when recorded. A fresh local iOS 27 simulator Debug build passes with the Telegram navigation change; three navigation/accessibility/Persian UI tests passed before that change.
+- RN 0.87.1 offline library, managed imports, SQLite/MMKV and EN/FA UI are intact. Android Media3 and iOS AVPlayer engines support basic playback, native sleep timer and A–B repeat. Controller now persists position, manual queue, repeat off/one/all and playback speed; player exposes previous/next, repeat and speed controls. iOS preferred speed persists through paused and remote play.
+- Phase 4: local user-supplied plain/LRC lyrics are saved in SQLite and shown with a playback-clock active line and adjustable offset. Discover shows bounded on-device related songs by artist/genre/album with reasons and small Persian locale priority. No online lyrics, recommendation or download provider is connected.
+- Phase 3 Telegram policy/scanner core remains disconnected from Telegram; own API credentials and native TDLib are still required.
+- Local verification on 2026-10-03: 59 tests/25 suites, typecheck, format check, lint (0 errors, eight existing warnings), diff check and iOS 27 simulator Debug build pass. Earlier iOS navigation/accessibility/Persian smoke passed three UI tests before the latest UI additions.
+- GitHub CI run 37099499793 for Telegram/picker changes was still in progress; run 37100374747 for the latest code was pending when recorded. Android native compilation previously passed on run 37098359433; its E2E stalled in DocumentsUI during a Pixel Launcher ANR. Picker retry is included in later source.
 
 ## Open gates
 
-- Phase 1: Android end-to-end import, native import/storage failure matrix, larger-text/screen-reader and physical-device audits. See `docs/phases/PHASE_01_FOUNDATION.md`.
-- Phase 2: real-file playback/seek/background, system next/previous/native queue, DSP/visualizer, interruption matrix and one-hour soak. See `docs/phases/PHASE_02_AUDIO.md`.
-- Phase 3: app-specific Telegram API ID/hash, TDLib Android/iOS packaging, secure key/auth, download/import integration, new-message sync, dedicated-account tests and current terms review. See `docs/phases/PHASE_03_TELEGRAM.md`. Never put credentials in Git.
-- Physical Android/iOS devices are unavailable in this workspace. Local Android Gradle SDK manifests fail to load; pinned GitHub CI is the Android build path.
+- Phase 1: Android end-to-end import, native import/storage failure matrix, large-text/screen-reader and physical-device audits.
+- Phase 2: real-file playback/seek/background tests, native-owned queue and system next/previous, shuffle, seek slider/queue sheet, DSP/visualizer, interruption matrix and one-hour soak.
+- Phase 3: Telegram credentials, TDLib packaging/auth, download/import and sync pipeline, dedicated-account tests and terms gate.
+- Phase 4: embedded/approved-provider lyrics and rights review, licensed recommendation/download providers, Android/iOS widgets, advanced EQ/gestures/visuals and device audits. Local lyrics and discovery do not close the full phase.
+- Physical Android/iOS devices are unavailable here. Local Android Gradle SDK manifests fail to load; pinned GitHub CI remains the Android build path.
 
 ## Resume next
 
-1. Inspect CI for 3a5b19e and fix remaining Android E2E picker failures. Verify iOS build after Telegram navigation change.
-2. Exercise real imported audio on iOS simulator and Android emulator; implement native queue/system controls and remaining player UI.
-3. Obtain app-specific Telegram credentials, package TDLib and connect auth/scanner/download pipeline. Scanner currently has no native client and must not be represented as functional Telegram import.
+1. Inspect current GitHub CI and fix Android E2E picker failures; run current UI smoke on iOS.
+2. Exercise real imported MP3/FLAC/M4A playback on emulators and devices; implement native queue/system controls and DSP where supported.
+3. Obtain app-specific Telegram credentials and integrate TDLib. Connect only approved lyrics/download providers after rights checks.
 4. Keep phase/status evidence current and push meaningful commits.
 
 ## Important files
 
-- `docs/IMPLEMENTATION_SPEC.md` — requirements and gates.
-- `app/src/domain/telegram/`, `app/src/infrastructure/telegram/`, `app/src/features/telegram/` — Phase 3 foundation.
-- `app/src/domain/playback/PlaybackController.ts`, `app/src/native/NativeAudio.ts` — playback interface.
-- `app/android/app/src/main/java/com/musicplayer/media/PlaybackService.kt`, `app/ios/MusicPlayer/NativeAudio.swift` — native engines.
+- `docs/IMPLEMENTATION_SPEC.md`, `docs/phases/PHASE_02_AUDIO.md`, `docs/phases/PHASE_04_EXPERIENCE.md` — requirements and phase evidence.
+- `app/src/domain/playback/PlaybackController.ts`, `app/ios/MusicPlayer/NativeAudio.swift` — playback.
+- `app/src/domain/lyrics/`, `app/src/infrastructure/database/lyricsRepository.ts`, `app/src/features/lyrics/` — local lyrics.
+- `app/src/domain/recommendations/`, `app/src/features/discovery/` — local discovery.

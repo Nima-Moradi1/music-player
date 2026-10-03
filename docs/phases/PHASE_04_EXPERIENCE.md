@@ -1,65 +1,34 @@
-# Phase 4 ? Advanced experience
+# Phase 4 — Advanced experience
+
+Status: IN PROGRESS (local features only)
+Source: `docs/IMPLEMENTATION_SPEC.md`, sections 15–17 and 27.
+Gate: lyrics, discovery, permitted downloads, widgets and advanced player experience require their full provider/native/device evidence. Phase 3 remains open; local Phase 4 work started at the user's request.
+
+### P4-T01 — Lyrics
+
+Status: IN PROGRESS
+Implemented: user-supplied plain/LRC lyrics saved per track in SQLite; timestamp parsing, binary-search active line from playback clock, and ±0.5-second saved timing offset. EN/FA Lyrics screen is accessible from track details. No lyrics leave the device.
+Evidence: parser, real SQLite repository and screen tests pass in the 59-test suite; iOS 27 simulator Debug build passes.
+Open: native embedded lyrics extraction, approved online provider and rights gate, provider result selection, complete lyric scrolling/device accessibility checks. No external lyrics are fetched.
+
+### P4-T02 — Discovery
+
+Status: IN PROGRESS
+Implemented: bounded local-library suggestions ranked by shared artist, genre and album; Persian locale gets a small tie preference. The Discover tab shows the reason and opens stored songs. Unplayable fixture entries and title-only matches are excluded.
+Evidence: ranking and SQLite-backed UI tests pass.
+Open: licensed provider adapters, wider-library paging and recommendation quality/device checks. No remote recommendations or download claims.
+
+### P4-T03 — Permitted downloads
 
 Status: TODO
-Source: docs/IMPLEMENTATION_SPEC.md, section 27.
-Gate: all mandatory tasks, tests and phase exit criteria must pass.
+Open: approved provider contract, legal capability and rights gate, resilient native transfer and validated managed import. No provider is enabled.
 
-### P4-T01 ? Embedded/cached/provider lyrics, LRC timing, offset and licensing gate.
-
-Status: TODO
-Depends: Phase 3 exit gate
-Files: app/src/features/, app/src/native/widgets/
-Acceptance:
-
-- Implement the corresponding section 27 requirements and honest unavailable/error states.
-- Update HANDOFF/status and commit a coherent change.
-  Tests:
-- Focused unit/integration tests and relevant native/device gates in section 22.
-
-### P4-T02 ? Artist/genre recommendations, locale priority and explanations.
+### P4-T04 — Widgets and system surfaces
 
 Status: TODO
-Depends: Phase 3 exit gate
-Files: app/src/features/, app/src/native/widgets/
-Acceptance:
+Open: Android widget, iOS WidgetKit/App Intents, artwork/actions/deep links and device tests. Existing Android MediaSession and iOS Now Playing controls are Phase 2 foundations, not widgets.
 
-- Implement the corresponding section 27 requirements and honest unavailable/error states.
-- Update HANDOFF/status and commit a coherent change.
-  Tests:
-- Focused unit/integration tests and relevant native/device gates in section 22.
-
-### P4-T03 ? Only licensed downloads, native resilience and shared import pipeline.
+### P4-T05 — Advanced EQ, gestures and visuals
 
 Status: TODO
-Depends: Phase 3 exit gate
-Files: app/src/features/, app/src/native/widgets/
-Acceptance:
-
-- Implement the corresponding section 27 requirements and honest unavailable/error states.
-- Update HANDOFF/status and commit a coherent change.
-  Tests:
-- Focused unit/integration tests and relevant native/device gates in section 22.
-
-### P4-T04 ? Android widget and iOS WidgetKit/App Intents.
-
-Status: TODO
-Depends: Phase 3 exit gate
-Files: app/src/features/, app/src/native/widgets/
-Acceptance:
-
-- Implement the corresponding section 27 requirements and honest unavailable/error states.
-- Update HANDOFF/status and commit a coherent change.
-  Tests:
-- Focused unit/integration tests and relevant native/device gates in section 22.
-
-### P4-T05 ? Advanced EQ/gestures/visuals and responsive accessibility/performance.
-
-Status: TODO
-Depends: Phase 3 exit gate
-Files: app/src/features/, app/src/native/widgets/
-Acceptance:
-
-- Implement the corresponding section 27 requirements and honest unavailable/error states.
-- Update HANDOFF/status and commit a coherent change.
-  Tests:
-- Focused unit/integration tests and relevant native/device gates in section 22.
+Open: cross-platform DSP/EQ capability, gesture editor, visualizer and accessibility/performance matrix. Playback speed is implemented under Phase 2; it does not close this task.
