@@ -25,7 +25,7 @@ Open: native queue, richer interruption/resume handling and real-device backgrou
 Status: IN PROGRESS
 Files: `PlaybackController.ts`, `NativeAudio.ts`, bootstrap.
 Implemented: persisted track/position/manual queue in MMKV; paused restore after relaunch; native position polling; completion advances queue; fixtures without audio cannot play.
-Evidence: 2 focused controller tests for paused restore and queue completion; full JavaScript suite 45 tests/17 suites passed locally.
+Evidence: 4 focused controller tests for paused restore, queue completion, native timer delegation and final-song replay; full JavaScript suite 47 tests/17 suites passed locally.
 Open: native-owned queue, shuffle/repeat, completion threshold, crash and process-death matrix, system-control event synchronization.
 
 ### P2-T04 — Player experience
@@ -33,7 +33,7 @@ Open: native-owned queue, shuffle/repeat, completion threshold, crash and proces
 Status: IN PROGRESS
 Files: details/player, mini-player, localization.
 Implemented: localized play/pause, 10-second seek, manual enqueue, queue count and next controls; native 30-minute sleep timer and A–B repeat with visible buttons.
-Evidence: 3 controller tests pass; iOS 27 simulator Debug build succeeds after native timer/repeat changes.
+Evidence: 4 controller tests pass; iOS 27 simulator Debug build succeeds after native timer/repeat changes.
 Open: full player layout, seek slider/tooltip, queue sheet, gesture registry/customization and device playback checks.
 
 ### P2-T05 — DSP and visuals

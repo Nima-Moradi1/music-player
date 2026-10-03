@@ -8,10 +8,9 @@ Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS
 ## Current state
 
 - RN 0.87.1 offline library, managed imports, SQLite/MMKV and EN/FA UI remain intact.
-- Phase 1 JavaScript CI passed on 41ff79f (run 37097418040). Android/iOS lanes were still running when checked.
-- Android E2E retry for transient UIAutomator dump was committed/pushed in 41ff79f.
-- Native playback foundation was committed/pushed in 19b4180: Android Media3 service; iOS AVPlayer and remote commands; player controls, mini-player, saved position and manual queue.
-- Local iOS 27 simulator Debug build succeeded for 19b4180; current-source Android build and native playback E2E remain pending.
+- JavaScript CI passed on 41ff79f and aa08b05. Run 37097418040 Android E2E failed after an emulator-swallowed onboarding tap; retries are pushed. Run 37098359433 is building native source; newer commits are queued.
+- Native playback commits 19b4180, f18bda7 and aa08b05 are pushed: Android Media3 service; iOS AVPlayer/system controls; player/mini-player, saved position/manual queue, native sleep timer and A–B repeat.
+- Local iOS 27 simulator Debug build succeeds including native timer/repeat and main-queue bridge changes. Current-source Android build and native playback E2E remain pending.
 - Local 47 tests/17 suites, typecheck, lint (zero errors/eight existing warnings), format check, iOS 27 simulator Debug build and plist validation pass. End-of-queue replay now restarts from zero.
 
 ## Evidence and open gates
@@ -24,10 +23,9 @@ Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS
 
 ## Resume next
 
-1. Commit/push native sleep timer/A–B controls, Android E2E onboarding retry and status documents.
-2. Inspect current-source CI after the next push; fix Android compile/E2E failures and record results.
-3. Run iOS simulator smoke for current source, then import a real audio fixture and exercise play/pause/seek/background/relaunch.
-4. Implement remaining Phase 1 gates and Phase 2 tasks, with real-device evidence before marking either phase DONE.
+1. Inspect the latest CI run after it starts; fix Android compile/E2E failures and record results.
+2. Complete the in-flight iOS simulator smoke rerun with the Settings-tap retry; then import a real audio fixture and exercise play/pause/seek/background/relaunch.
+3. Implement remaining Phase 1 gates and Phase 2 tasks, with real-device evidence before marking either phase DONE.
 
 ## Important files
 

@@ -16,6 +16,7 @@ final class NativeAudio: NSObject {
   private var repeatObserver: Any?
 
   @objc static func requiresMainQueueSetup() -> Bool { true }
+  @objc func methodQueue() -> DispatchQueue { DispatchQueue.main }
 
   override init() {
     super.init()
