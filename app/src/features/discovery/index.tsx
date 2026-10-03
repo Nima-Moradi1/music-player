@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import {Linking} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -13,6 +14,11 @@ import {
 } from '../../app/providers/Services';
 import type {RootStackParamList} from '../../app/navigation/types';
 import {recommendLocal, type LocalRecommendation} from '../../domain/recommendations';
+import type {Track} from '../../domain/track';
+import {
+  findRelatedRecordings,
+  type OnlineRecording,
+} from '../../infrastructure/recommendations/musicBrainz';
 
 export function DiscoveryScreen() {
   const {t} = useTranslation();
@@ -22,10 +28,21 @@ export function DiscoveryScreen() {
   const version = useLibraryVersion();
   const {locale} = useSettings();
   const [items, setItems] = useState<LocalRecommendation[]>([]);
+  const [anchor, setAnchor] = useState<Track | null>(null);
+  const [onlineItems, setOnlineItems] = useState<OnlineRecording[]>([]);
+  const [onlineBusy, setOnlineBusy] = useState(false);
+  const [onlineSearched, setOnlineSearched] = useState(false);
+  const [onlineError, setOnlineError] = useState(false);
+  const onlineRequest = useRef<AbortController | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   useEffect(() => {
     let alive = true;
+    onlineRequest.current?.abort();
+    setOnlineItems([]);
+    setOnlineBusy(false);
+    setOnlineSearched(false);
+    setOnlineError(false);
     setLoading(true);
     setError(false);
     Promise.all([
@@ -34,10 +51,11 @@ export function DiscoveryScreen() {
       services.tracks.firstPlayable(),
     ])
       .then(async ([selected, favorite, first]) => {
-        const anchor = (selected?.managedPath ? selected : null) ?? favorite ?? first;
-        const tracks = anchor ? await services.tracks.relatedCandidates(anchor) : [];
+        const activeTrack = (selected?.managedPath ? selected : null) ?? favorite ?? first;
+        const tracks = activeTrack ? await services.tracks.relatedCandidates(activeTrack) : [];
         if (alive) {
-          setItems(anchor ? recommendLocal(anchor, tracks, locale) : []);
+          setAnchor(activeTrack);
+          setItems(activeTrack ? recommendLocal(activeTrack, tracks, locale) : []);
         }
       })
       .catch(() => {
@@ -48,8 +66,29 @@ export function DiscoveryScreen() {
       });
     return () => {
       alive = false;
+      onlineRequest.current?.abort();
     };
   }, [services, selectedId, version, locale]);
+  function searchOnline() {
+    if (!anchor || onlineBusy) return;
+    const request = new AbortController();
+    onlineRequest.current = request;
+    setOnlineBusy(true);
+    setOnlineError(false);
+    void findRelatedRecordings(anchor, request.signal)
+      .then(result => {
+        if (!request.signal.aborted) {
+          setOnlineItems(result);
+          setOnlineSearched(true);
+        }
+      })
+      .catch(() => {
+        if (!request.signal.aborted) setOnlineError(true);
+      })
+      .finally(() => {
+        if (!request.signal.aborted) setOnlineBusy(false);
+      });
+  }
   return (
     <Page>
       <Text kind="heading">{t('discover')}</Text>
@@ -86,6 +125,35 @@ export function DiscoveryScreen() {
             </Text>
           </React.Fragment>
         ))
+      )}
+      {anchor && (
+        <Surface>
+          <Text kind="title">{t('onlineRelatedTitle')}</Text>
+          <Text muted>{t('onlineRelatedBody')}</Text>
+          <Button
+            label={onlineBusy ? t('loading') : t('onlineRelatedButton')}
+            disabled={onlineBusy}
+            onPress={searchOnline}
+          />
+          {onlineError && <Text accessibilityLiveRegion="polite">{t('onlineRelatedError')}</Text>}
+          {onlineSearched && !onlineItems.length && <Text muted>{t('onlineRelatedEmpty')}</Text>}
+          {onlineItems.map(item => (
+            <Surface key={item.id}>
+              <Text kind="title">{item.title}</Text>
+              <Text>{item.artist}</Text>
+              <Text kind="caption" muted>
+                {t(`related_${item.reason}`)}
+              </Text>
+              <Button
+                label={t('viewRecording')}
+                secondary
+                onPress={() => {
+                  void Linking.openURL(item.sourceUrl).catch(() => setOnlineError(true));
+                }}
+              />
+            </Surface>
+          ))}
+        </Surface>
       )}
     </Page>
   );

@@ -17,7 +17,7 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [~] P1-T11 Manual import, 10k fixture, diagnostics and functional mini-player controls; native import failure matrix remains open.
 - [~] P1-T12 Android build/native tests passed in CI run 37098359433. The all-files picker fix was included in run 37100739974, but Android E2E failed; exact assertion is pending log access.
 - [x] P1-T13 iOS Debug build, iOS 27 simulator boot and two native UI tests pass after Pod target and scene-lifecycle fixes (2026-10-02).
-- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates; earlier iOS simulator audits passed, but run 37100739974 iOS smoke failed. Android E2E, screen-reader and physical-device evidence pending.
+- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates; earlier iOS simulator audits passed, but run 37100739974 exited 65 during redirected `xcodebuild test`. The supplied console excerpt omits `foundation-ui.log`, so the failing assertion remains unknown. Android E2E, screen-reader and physical-device evidence pending.
 
 Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/PHASE_01_FOUNDATION.md` and `docs/qa/`. Physical-device and screen-reader gates cannot be marked complete from simulator evidence. Phase 2 implementation has begun at the user's request; its exit remains open.
 
@@ -42,7 +42,7 @@ Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/
 ## Phase 4 — Advanced experience
 
 - [~] P4-T01 Local plain/LRC lyrics, SQLite cache, active line and offset UI; bounded native embedded extraction added for iOS and Android MP3. Device verification, other Android formats and approved-provider/licensing gate pending.
-- [~] P4-T02 Bounded on-device artist/genre/album recommendations now query playable matches beyond the first title page; provider adapters and device checks pending.
+- [~] P4-T02 Bounded on-device artist/genre/album recommendations query playable matches beyond the first title page. User-triggered MusicBrainz recording metadata discovery now uses local ranking, rate limiting and source links; commercial terms/device checks and broader licensed sources pending.
 - [~] P4-T03 Disabled licensed-provider/transfer contract and rights/URL/storage gates reuse managed import; approved provider, native transfer and UI pending.
 - [ ] P4-T04 Android widget and iOS WidgetKit/App Intents.
 - [ ] P4-T05 Advanced EQ/gestures/visuals and responsive accessibility/performance.

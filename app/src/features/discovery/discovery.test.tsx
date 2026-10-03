@@ -11,7 +11,11 @@ import {migrate} from '../../infrastructure/database/migrations';
 import {SqliteTrackRepository} from '../../infrastructure/database/trackRepository';
 
 const mockNavigate = jest.fn();
+const mockFindRelatedRecordings = jest.fn().mockResolvedValue([]);
 jest.mock('@react-navigation/native', () => ({useNavigation: () => ({navigate: mockNavigate})}));
+jest.mock('../../infrastructure/recommendations/musicBrainz', () => ({
+  findRelatedRecordings: (...args: unknown[]) => mockFindRelatedRecordings(...args),
+}));
 
 it('shows local related music with its reason and opens the stored track', async () => {
   await initializeI18n('en');
@@ -33,6 +37,9 @@ it('shows local related music with its reason and opens the stored track', async
     </ServicesProvider>,
   );
   await waitFor(() => expect(screen.getByText('Same artist')).toBeOnTheScreen());
+  expect(mockFindRelatedRecordings).not.toHaveBeenCalled();
+  fireEvent.press(screen.getByRole('button', {name: 'Find related recordings'}));
+  await waitFor(() => expect(mockFindRelatedRecordings).toHaveBeenCalledTimes(1));
   fireEvent.press(screen.getByRole('button', {name: `${related.title}, ${related.artist}`}));
   expect(mockNavigate).toHaveBeenCalledWith('Details', {trackId: related.id});
   screen.unmount();

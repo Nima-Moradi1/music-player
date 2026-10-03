@@ -39,7 +39,7 @@ if grep -E 'Unhandled JS Exception|RCTFatal|Invalid hook call|Terminating app du
   exit 1
 fi
 result_bundle="$artifact_dir/foundation-ui-$(date +%Y%m%d%H%M%S).xcresult"
-xcodebuild \
+if ! xcodebuild \
   -workspace app/ios/MusicPlayer.xcworkspace \
   -scheme MusicPlayer \
   -configuration Debug \
@@ -47,5 +47,9 @@ xcodebuild \
   -derivedDataPath app/ios/build \
   -resultBundlePath "$result_bundle" \
   -parallel-testing-enabled NO \
-  CODE_SIGNING_ALLOWED=NO test > "$artifact_dir/foundation-ui.log" 2>&1
+  CODE_SIGNING_ALLOWED=NO test > "$artifact_dir/foundation-ui.log" 2>&1; then
+  echo "Foundation UI tests failed. Final xcodebuild output:" >&2
+  tail -n 160 "$artifact_dir/foundation-ui.log" >&2
+  exit 1
+fi
 echo "Simulator launch and Foundation UI test passed: $device_id / $bundle_id."

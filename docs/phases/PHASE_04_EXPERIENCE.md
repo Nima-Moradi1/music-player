@@ -8,23 +8,23 @@ Gate: lyrics, discovery, permitted downloads, widgets and advanced player experi
 
 Status: IN PROGRESS
 Implemented: user-supplied plain/LRC lyrics saved per track in SQLite; timestamp parsing, binary-search active line from playback clock, and ±0.5-second saved timing offset. EN/FA Lyrics screen is accessible from track details. No lyrics leave the device.
-Evidence: parser, real SQLite repository and screen tests pass in the 59-test suite; iOS 27 simulator Debug build and three UI smoke tests pass.
+Evidence: parser, real SQLite repository and screen tests pass locally; an earlier iOS 27 simulator Debug build and three UI smoke tests passed. The later CI run failed its redirected UI test stage.
 Implemented since that pass: native import reads bounded iOS lyric metadata and Android MP3 ID3v2 USLT, caches it locally, and prefers later manual edits.
-Open: device verification of embedded decoding and Android formats beyond MP3, approved online provider and rights gate, provider result selection, complete lyric scrolling/device accessibility checks. No external lyrics are fetched.
+Open: device verification of embedded decoding and Android formats beyond MP3, approved online provider and rights gate, provider result selection, complete lyric scrolling/device accessibility checks. The user limited online lyrics to English, Spanish, German and Italian; language identification for German and Italian is not yet represented in track metadata. [Google's terms](https://policies.google.com/terms) do not grant an app a license to copy third-party full lyrics from Search, and its [Custom Search JSON API](https://developers.google.com/custom-search/v1/overview) is closed to new customers. No external lyrics are fetched.
 
 ### P4-T02 — Discovery
 
 Status: IN PROGRESS
 Implemented: bounded local-library suggestions ranked by shared artist, genre and album; Persian locale gets a small tie preference. The Discover tab shows the reason and opens stored songs. Unplayable fixture entries and title-only matches are excluded.
 Evidence: ranking and SQLite-backed UI tests pass.
-Implemented since the earlier pass: discovery now queries bounded playable artist/genre/album matches directly from SQLite instead of taking the first 200 titles; a real SQLite case covers matches beyond that first page.
-Open: licensed provider adapters and recommendation quality/device checks. No remote recommendations or download claims.
+Implemented since the earlier pass: discovery queries bounded playable artist/genre/album matches directly from SQLite instead of taking the first 200 titles; a real SQLite case covers matches beyond that first page. A user-triggered MusicBrainz metadata search displays distinct recordings by the current artist, ranks available genre tags, rate limits requests and links to the source page. It never labels a recording as downloadable.
+Open: [MusicBrainz API](https://musicbrainz.org/doc/MusicBrainz_API) commercial-use decision, wider source coverage, recommendation quality/device checks and explicit licenses for any audio offers.
 
 ### P4-T03 — Permitted downloads
 
 Status: IN PROGRESS
 Implemented: a disabled-by-default licensed offer/provider/transfer contract verifies offline-copy rights, provider identity, file bounds, short-lived HTTPS URL, free space and cancellation. It reuses managed import for validation, hash dedupe and `app_download` provenance, then cleans up adapter-owned temporary files.
-Open: approved provider and rights review, resilient native transfer and UI/progress states. No provider is enabled.
+Open: approved source with per-track offline-copy rights and attribution, resilient native transfer and UI/progress states. A public audio URL alone is not proof of these rights. No download provider is enabled.
 
 ### P4-T04 — Widgets and system surfaces
 

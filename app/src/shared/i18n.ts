@@ -161,6 +161,13 @@ export const en = {
   related_artist: 'Same artist',
   related_genre: 'Same genre',
   related_album: 'Same album',
+  onlineRelatedTitle: 'Explore recordings online',
+  onlineRelatedBody:
+    'Searches MusicBrainz only when you tap below. These are recording details, not audio downloads.',
+  onlineRelatedButton: 'Find related recordings',
+  onlineRelatedError: 'Online discovery is unavailable. Try again later.',
+  onlineRelatedEmpty: 'No related recordings were found.',
+  viewRecording: 'View recording details',
   discoverBody:
     'Recommendations and licensed downloads arrive after native playback and Telegram pass their gates.',
   downloadsTitle: 'Your next favorites live here',
@@ -359,6 +366,13 @@ export const fa: typeof en = {
   related_artist: 'هنرمند مشترک',
   related_genre: 'سبک مشترک',
   related_album: 'آلبوم مشترک',
+  onlineRelatedTitle: 'کاوش آثار آنلاین',
+  onlineRelatedBody:
+    'فقط با زدن دکمه در MusicBrainz جستجو می‌شود. این‌ها اطلاعات آثارند، نه فایل‌های قابل دانلود.',
+  onlineRelatedButton: 'یافتن آثار مرتبط',
+  onlineRelatedError: 'جستجوی آنلاین در دسترس نیست. بعداً دوباره تلاش کنید.',
+  onlineRelatedEmpty: 'اثر مرتبطی پیدا نشد.',
+  viewRecording: 'دیدن اطلاعات اثر',
   discoverBody: 'پیشنهادها و دانلود مجاز پس از تأیید پخش بومی و تلگرام اضافه می‌شوند.',
   downloadsTitle: 'محبوب‌های بعدی شما اینجاست',
   downloadsBody: 'ارائه‌دهنده دانلود فعال نیست. فایل‌های واردشده در کتابخانه‌اند.',
