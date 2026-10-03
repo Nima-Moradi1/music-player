@@ -19,12 +19,12 @@ Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS
 - Phase 2: native playback needs Android CI compilation and both-platform real-file play/seek/background tests. Sleep timer and A–B repeat code exists but needs device verification. Native queue/system next, shuffle/repeat, DSP, visualizer and one-hour soak remain open; see `docs/phases/PHASE_02_AUDIO.md`.
 - Physical Android/iOS devices are unavailable in this workspace. Simulator results cannot close real-device interruption or soak gates.
 - Local Android SDK repository manifests still fail to load; pinned GitHub CI is the Android verification path.
-- Current local iOS smoke reached all UI tests; its first accessibility test missed a Settings tap while the second test passed. A bounded Settings retry was added and needs a rerun.
+- Current local iOS smoke passes after the bounded Settings retry: 3 UI tests, zero failures, app process survived. Playback with a real imported file was not covered by those tests.
 
 ## Resume next
 
 1. Inspect the latest CI run after it starts; fix Android compile/E2E failures and record results.
-2. Complete the in-flight iOS simulator smoke rerun with the Settings-tap retry; then import a real audio fixture and exercise play/pause/seek/background/relaunch.
+2. Import a real audio fixture on iOS and exercise play/pause/seek/background/relaunch.
 3. Implement remaining Phase 1 gates and Phase 2 tasks, with real-device evidence before marking either phase DONE.
 
 ## Important files
