@@ -1,6 +1,14 @@
 import XCTest
 
 final class FoundationUITests: XCTestCase {
+  private func openSettings(_ app: XCUIApplication) {
+    for _ in 0..<3 {
+      if app.staticTexts["Appearance"].waitForExistence(timeout: 3) { return }
+      if app.buttons["Settings"].exists { app.buttons["Settings"].tap() }
+    }
+    XCTAssertTrue(app.staticTexts["Appearance"].waitForExistence(timeout: 10))
+  }
+
   func testAccessibleHomeLibraryAndSettings() throws {
     guard #available(iOS 17.0, *) else {
       throw XCTSkip("XCTest accessibility audits require iOS 17 or newer")
@@ -18,8 +26,7 @@ final class FoundationUITests: XCTestCase {
     XCTAssertTrue(app.textFields["Search your library"].waitForExistence(timeout: 15))
     try app.performAccessibilityAudit(for: [.hitRegion, .sufficientElementDescription, .textClipped])
 
-    app.buttons["Settings"].tap()
-    XCTAssertTrue(app.staticTexts["Appearance"].waitForExistence(timeout: 10))
+    openSettings(app)
     try app.performAccessibilityAudit(for: [.hitRegion, .sufficientElementDescription, .textClipped])
   }
 
@@ -38,8 +45,7 @@ final class FoundationUITests: XCTestCase {
     library.tap()
     XCTAssertTrue(app.textFields["Search your library"].waitForExistence(timeout: 15))
 
-    app.buttons["Settings"].tap()
-    XCTAssertTrue(app.staticTexts["Appearance"].waitForExistence(timeout: 10))
+    openSettings(app)
   }
 
   func testPersianSettingsAndSelectionPersist() throws {
@@ -48,8 +54,7 @@ final class FoundationUITests: XCTestCase {
     let start = app.buttons["Make it yours"]
     if start.waitForExistence(timeout: 15) { start.tap() }
 
-    app.buttons["Settings"].tap()
-    XCTAssertTrue(app.staticTexts["Appearance"].waitForExistence(timeout: 10))
+    openSettings(app)
     app.buttons["Dark"].tap()
     XCTAssertTrue(app.buttons["Dark"].isSelected)
     app.buttons["فارسی"].tap()

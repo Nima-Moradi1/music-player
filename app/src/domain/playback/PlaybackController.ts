@@ -8,6 +8,7 @@ export type PlayerState = {
   title: string;
   artist: string;
   playing: boolean;
+  ended: boolean;
   positionMs: number;
   durationMs: number;
   queue: string[];
@@ -22,6 +23,7 @@ const empty: PlayerState = {
   title: '',
   artist: '',
   playing: false,
+  ended: false,
   positionMs: 0,
   durationMs: 0,
   queue: [],
@@ -62,14 +64,16 @@ export class PlaybackController {
         return;
       }
       await this.native.load(track.managedPath, track.title, track.artist);
-      if (saved.positionMs && saved.positionMs < track.durationMs - 5000) {
-        await this.native.seekTo(saved.positionMs);
+      const positionMs =
+        saved.positionMs && saved.positionMs < track.durationMs - 5000 ? saved.positionMs : 0;
+      if (positionMs) {
+        await this.native.seekTo(positionMs);
       }
       this.state.setState({
         trackId: track.id,
         title: track.title,
         artist: track.artist,
-        positionMs: saved.positionMs ?? 0,
+        positionMs,
         durationMs: track.durationMs,
         queue: saved.queue?.filter(id => typeof id === 'string') ?? [track.id],
       });
@@ -90,6 +94,7 @@ export class PlaybackController {
       title: track.title,
       artist: track.artist,
       playing: false,
+      ended: false,
       positionMs: 0,
       durationMs: track.durationMs,
       queue: queue.includes(track.id) ? queue : [track.id, ...queue],
@@ -107,7 +112,7 @@ export class PlaybackController {
         await this.load(track);
       }
       await this.native.play();
-      this.state.setState({playing: true, error: null});
+      this.state.setState({playing: true, ended: false, error: null});
     } catch (error) {
       this.state.setState({playing: false, error: String(error)});
       throw error;
@@ -120,8 +125,14 @@ export class PlaybackController {
       this.state.setState({playing: false});
       this.save();
     } else {
+      if (this.state.getState().ended) {
+        await this.native.seekTo(0);
+      }
       await this.native.play();
-      this.state.setState({playing: true});
+      this.state.setState({playing: true, ended: false});
+      if (!this.polling) {
+        this.startPolling();
+      }
     }
   }
 
@@ -170,7 +181,11 @@ export class PlaybackController {
     const nextId = queue[queue.indexOf(trackId ?? '') + 1];
     if (!nextId) {
       await this.native.pause();
-      this.state.setState({playing: false});
+      this.state.setState({playing: false, ended: true});
+      if (this.polling) {
+        clearInterval(this.polling);
+        this.polling = null;
+      }
       return;
     }
     const track = await this.tracks.get(nextId);
@@ -205,6 +220,7 @@ export class PlaybackController {
       }
       this.state.setState({
         playing: native.playing,
+        ended: false,
         positionMs: native.positionMs,
         durationMs: native.durationMs || this.state.getState().durationMs,
         sleepUntilMs:

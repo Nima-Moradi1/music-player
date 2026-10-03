@@ -17,7 +17,7 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [~] P1-T11 Manual import, 10k fixture, diagnostics, mini-player placeholder.
 - [~] P1-T12 Android debug build and native tests passed in feature CI run 37046205237. Run 37097418040 reached onboarding but the first tap was swallowed by the emulator; onboarding tap retry is implemented, awaiting E2E rerun.
 - [x] P1-T13 iOS Debug build, iOS 27 simulator boot and two native UI tests pass after Pod target and scene-lifecycle fixes (2026-10-02).
-- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates; 46 JS tests and iOS simulator navigation/accessibility audits pass, Android current-source and screen-reader evidence pending.
+- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates; 47 JS tests pass, historical iOS simulator navigation/accessibility audits pass, current iOS Settings-tap flake has a retry awaiting verification; Android current-source and screen-reader evidence pending.
 
 Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/PHASE_01_FOUNDATION.md` and `docs/qa/`. Physical-device and screen-reader gates cannot be marked complete from simulator evidence. Phase 2 implementation has begun at the user's request; its exit remains open.
 

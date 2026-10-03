@@ -184,4 +184,4 @@ Acceptance:
 
 Tests:
 
-- Desktop SQLite/Android fixture smoke and iOS simulator navigation/accessibility audits pass; Android current-source, screen-reader and physical-device evidence remain open. Phase 2 code was started by explicit user request while these gates remain open.
+- Desktop SQLite/Android fixture smoke and historical iOS simulator navigation/accessibility audits pass. The current local iOS smoke rerun reached Settings in two UI tests, but the first Settings tap was swallowed in the accessibility test; a bounded retry is awaiting verification. Android current-source, screen-reader and physical-device evidence remain open. Phase 2 code was started by explicit user request while these gates remain open.

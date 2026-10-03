@@ -12,7 +12,7 @@ Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS
 - Android E2E retry for transient UIAutomator dump was committed/pushed in 41ff79f.
 - Native playback foundation was committed/pushed in 19b4180: Android Media3 service; iOS AVPlayer and remote commands; player controls, mini-player, saved position and manual queue.
 - Local iOS 27 simulator Debug build succeeded for 19b4180; current-source Android build and native playback E2E remain pending.
-- Local 46 tests/17 suites, typecheck, lint (zero errors/eight existing warnings), format check, iOS 27 simulator Debug build and plist validation pass after native sleep timer and A–B repeat changes.
+- Local 47 tests/17 suites, typecheck, lint (zero errors/eight existing warnings), format check, iOS 27 simulator Debug build and plist validation pass. End-of-queue replay now restarts from zero.
 
 ## Evidence and open gates
 
@@ -20,6 +20,7 @@ Status: Phase 1 PARTIAL; Phase 2 IN PROGRESS
 - Phase 2: native playback needs Android CI compilation and both-platform real-file play/seek/background tests. Sleep timer and A–B repeat code exists but needs device verification. Native queue/system next, shuffle/repeat, DSP, visualizer and one-hour soak remain open; see `docs/phases/PHASE_02_AUDIO.md`.
 - Physical Android/iOS devices are unavailable in this workspace. Simulator results cannot close real-device interruption or soak gates.
 - Local Android SDK repository manifests still fail to load; pinned GitHub CI is the Android verification path.
+- Current local iOS smoke reached all UI tests; its first accessibility test missed a Settings tap while the second test passed. A bounded Settings retry was added and needs a rerun.
 
 ## Resume next
 

@@ -89,3 +89,17 @@ it('delegates sleep and A-B repeat to native playback', async () => {
   expect(native.setSleepTimer).toHaveBeenLastCalledWith(0);
   expect(native.setABRepeat).toHaveBeenLastCalledWith(-1, -1);
 });
+
+it('restarts the final song from zero after the queue ends', async () => {
+  jest.useFakeTimers();
+  const {first, native, controller} = setup();
+  await controller.playTrack(first);
+  native.getState.mockResolvedValueOnce(
+    JSON.stringify({playing: false, ended: true, positionMs: 60000, durationMs: 60000}),
+  );
+  await controller.refresh();
+  expect(controller.state.getState().ended).toBe(true);
+  await controller.toggle();
+  expect(native.seekTo).toHaveBeenCalledWith(0);
+  expect(controller.state.getState().playing).toBe(true);
+});
