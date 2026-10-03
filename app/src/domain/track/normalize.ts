@@ -19,7 +19,7 @@ export function classifyLanguage(input: {
     return {language: input.correction, confidence: 1};
   }
   const code = input.metadataLanguage?.toLowerCase().split(/[-_]/)[0];
-  if (code && ['fa', 'en', 'ar', 'es'].includes(code)) {
+  if (code && ['fa', 'en', 'ar', 'es', 'de', 'it'].includes(code)) {
     return {language: code as Language, confidence: 0.95};
   }
   // Script is useful evidence but cannot distinguish Persian/Arabic or Latin languages.

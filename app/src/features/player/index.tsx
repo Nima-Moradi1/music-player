@@ -471,7 +471,7 @@ export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackPara
       </Surface>
       <Text kind="title">{t('correction')}</Text>
       <Text muted>{t('correctionBody')}</Text>
-      {(['fa', 'en', 'ar', 'es', 'other'] as Language[]).map(language => (
+      {(['fa', 'en', 'ar', 'es', 'de', 'it', 'other'] as Language[]).map(language => (
         <Button
           key={language}
           disabled={pending || loading}

@@ -50,6 +50,14 @@ if ! xcodebuild \
   CODE_SIGNING_ALLOWED=NO test > "$artifact_dir/foundation-ui.log" 2>&1; then
   echo "Foundation UI tests failed. Final xcodebuild output:" >&2
   tail -n 160 "$artifact_dir/foundation-ui.log" >&2
+  if [[ -d "$result_bundle" ]] && xcrun xcresulttool get test-results summary --path "$result_bundle" > "$artifact_dir/foundation-summary.json" 2>/dev/null; then
+    cat "$artifact_dir/foundation-summary.json" >&2
+  fi
+  while IFS= read -r failure; do
+    failure="${failure//'%'/'%25'}"
+    failure="${failure//$'\r'/'%0D'}"
+    echo "::error title=iOS Foundation UI test::${failure:0:1000}"
+  done < <(grep -E 'error:|Test Case .* failed|Assertion Failure|Testing failed' "$artifact_dir/foundation-ui.log" | tail -n 10 || true)
   exit 1
 fi
 echo "Simulator launch and Foundation UI test passed: $device_id / $bundle_id."

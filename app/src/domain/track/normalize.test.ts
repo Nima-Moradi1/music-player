@@ -11,6 +11,8 @@ describe('local categorization and search', () => {
   });
   it('trusts explicit metadata and always respects a user correction', () => {
     expect(classifyLanguage({text: 'سلام', metadataLanguage: 'fa-IR'}).language).toBe('fa');
+    expect(classifyLanguage({text: 'Song', metadataLanguage: 'de-DE'}).language).toBe('de');
+    expect(classifyLanguage({text: 'Song', metadataLanguage: 'it_IT'}).language).toBe('it');
     expect(
       classifyLanguage({
         text: 'سلام',

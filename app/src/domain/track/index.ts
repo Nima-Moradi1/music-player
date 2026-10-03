@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const languageSchema = z.enum(['fa', 'en', 'ar', 'es', 'other']);
+export const languageSchema = z.enum(['fa', 'en', 'ar', 'es', 'de', 'it', 'other']);
 export type Language = z.infer<typeof languageSchema>;
 export const trackSchema = z.object({
   id: z.uuid(),
