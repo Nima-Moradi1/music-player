@@ -2,6 +2,7 @@ import {NativeModules} from 'react-native';
 export interface ManagedMediaNativeV1 {
   createId(): Promise<string>;
   stage(jobId: string, uri: string, maxBytes: number): Promise<string>;
+  download(jobId: string, url: string, maxBytes: number): Promise<string>;
   inspect(jobId: string, path: string): Promise<string>;
   promote(path: string, hash: string, extension: string): Promise<string>;
   remove(path: string): Promise<void>;

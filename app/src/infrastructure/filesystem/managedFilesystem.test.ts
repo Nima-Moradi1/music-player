@@ -8,6 +8,7 @@ it('removes a staged file when cancellation races with native completion', async
       controller.abort();
       return 'private-temp';
     }),
+    download: jest.fn(),
     inspect: jest.fn(),
     promote: jest.fn(),
     remove: jest.fn().mockResolvedValue(undefined),

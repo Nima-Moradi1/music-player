@@ -226,8 +226,20 @@ export class SqliteTrackRepository implements TrackRepository {
     source: TrackSource,
   ): Promise<void> {
     await session.execute(
-      `INSERT OR IGNORE INTO track_sources (track_id,source_type,original_filename,telegram_chat_id,telegram_message_id) VALUES (?,?,?,?,?)`,
-      [id, source.type, source.originalFilename, source.chatId ?? null, source.messageId ?? null],
+      `INSERT OR IGNORE INTO track_sources (track_id,source_type,original_filename,telegram_chat_id,telegram_message_id,provider_id,provider_item_id,source_url,author,license,license_url) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+      [
+        id,
+        source.type,
+        source.originalFilename,
+        source.chatId ?? null,
+        source.messageId ?? null,
+        source.providerId ?? null,
+        source.providerItemId ?? null,
+        source.sourceUrl ?? null,
+        source.author ?? null,
+        source.license ?? null,
+        source.licenseUrl ?? null,
+      ],
     );
   }
   async addSource(id: string, source: TrackSource): Promise<void> {

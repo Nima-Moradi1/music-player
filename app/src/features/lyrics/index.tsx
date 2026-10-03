@@ -1,5 +1,5 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {TextInput, StyleSheet} from 'react-native';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {Linking, TextInput, StyleSheet} from 'react-native';
 import {useStore} from 'zustand';
 import {useTranslation} from 'react-i18next';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -8,6 +8,8 @@ import {useServices} from '../../app/providers/Services';
 import type {RootStackParamList} from '../../app/navigation/types';
 import {activeLineIndex, type LyricsDocument} from '../../domain/lyrics';
 import {SqliteLyricsRepository} from '../../infrastructure/database/lyricsRepository';
+import {findWikisourceLyrics, type WikisourceLyric} from '../../infrastructure/lyrics/wikisource';
+import type {Language} from '../../domain/track';
 
 export function LyricsScreen({route}: NativeStackScreenProps<RootStackParamList, 'Lyrics'>) {
   const {t} = useTranslation();
@@ -24,7 +26,28 @@ export function LyricsScreen({route}: NativeStackScreenProps<RootStackParamList,
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  const [onlineLanguage, setOnlineLanguage] = useState<Language>('en');
+  const [songTitle, setSongTitle] = useState('');
+  const [onlineResults, setOnlineResults] = useState<WikisourceLyric[]>([]);
+  const [onlineSelected, setOnlineSelected] = useState<WikisourceLyric | null>(null);
+  const [onlineBusy, setOnlineBusy] = useState(false);
+  const [onlineError, setOnlineError] = useState(false);
+  const [onlineSearched, setOnlineSearched] = useState(false);
+  const onlineRequest = useRef<AbortController | null>(null);
   const trackId = route.params.trackId;
+  useEffect(() => {
+    let alive = true;
+    void services.tracks.get(trackId).then(track => {
+      if (alive && track) {
+        setSongTitle(track.title);
+        if (['en', 'es', 'de', 'it'].includes(track.language)) setOnlineLanguage(track.language);
+      }
+    });
+    return () => {
+      alive = false;
+      onlineRequest.current?.abort();
+    };
+  }, [services, trackId]);
   useEffect(() => {
     let alive = true;
     repository
@@ -155,6 +178,73 @@ export function LyricsScreen({route}: NativeStackScreenProps<RootStackParamList,
               </Row>
             </Surface>
           )}
+          <Surface>
+            <Text kind="title">{t('wikisourceTitle')}</Text>
+            <Text muted>{t('wikisourceBody')}</Text>
+            {(['en', 'es', 'de', 'it'] as const).map(language => (
+              <Button
+                key={language}
+                label={t(language)}
+                selected={onlineLanguage === language}
+                secondary={onlineLanguage !== language}
+                onPress={() => {
+                  onlineRequest.current?.abort();
+                  setOnlineLanguage(language);
+                  setOnlineResults([]);
+                  setOnlineSelected(null);
+                  setOnlineSearched(false);
+                }}
+              />
+            ))}
+            <Button
+              label={onlineBusy ? t('loading') : t('wikisourceSearch')}
+              disabled={onlineBusy || !songTitle}
+              onPress={() => {
+                onlineRequest.current?.abort();
+                const controller = new AbortController();
+                onlineRequest.current = controller;
+                setOnlineBusy(true);
+                setOnlineError(false);
+                setOnlineSelected(null);
+                void findWikisourceLyrics(songTitle, onlineLanguage, controller.signal)
+                  .then(found => {
+                    if (!controller.signal.aborted) {
+                      setOnlineResults(found);
+                      setOnlineSearched(true);
+                    }
+                  })
+                  .catch(() => {
+                    if (!controller.signal.aborted) setOnlineError(true);
+                  })
+                  .finally(() => {
+                    if (!controller.signal.aborted) setOnlineBusy(false);
+                  });
+              }}
+            />
+            {onlineError && <Text>{t('wikisourceError')}</Text>}
+            {onlineSearched && !onlineResults.length && <Text muted>{t('wikisourceEmpty')}</Text>}
+            {onlineResults.map(item => (
+              <Button
+                key={item.sourceUrl}
+                label={item.title}
+                secondary
+                onPress={() => setOnlineSelected(item)}
+              />
+            ))}
+            {onlineSelected && (
+              <Surface>
+                <Text muted>{t('wikisourceAttribution', {title: onlineSelected.title})}</Text>
+                <Text>{onlineSelected.text}</Text>
+                <Button
+                  label={t('catalogSource')}
+                  secondary
+                  onPress={() => {
+                    void Linking.openURL(onlineSelected.sourceUrl);
+                  }}
+                />
+              </Surface>
+            )}
+          </Surface>
           {error && <Text accessibilityLiveRegion="polite">{t('actionFailed')}</Text>}
         </>
       )}

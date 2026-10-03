@@ -23,7 +23,12 @@ it('saves local LRC and displays the active line from playback time', async () =
     originalFilename: 'fixture',
   });
   const audio = {state: createStore(() => ({trackId: track.id, positionMs: 3000}))};
-  const services = {database, audio, state: createAppState(defaultSettings)} as unknown as Services;
+  const services = {
+    database,
+    audio,
+    tracks: new SqliteTrackRepository(database),
+    state: createAppState(defaultSettings),
+  } as unknown as Services;
   const props = {route: {params: {trackId: track.id}}} as NativeStackScreenProps<
     RootStackParamList,
     'Lyrics'

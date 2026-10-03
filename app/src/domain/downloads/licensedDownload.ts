@@ -7,13 +7,16 @@ export type LicensedOffer = {
   sizeBytes: number;
   offlineCopyAllowed: boolean;
   license: string;
+  author: string;
+  sourceUrl: string;
+  licenseUrl: string;
 };
 
 export interface LicensedDownloadProvider {
   readonly id: string;
   /** Resolve immediately before transfer; signed URLs must never be persisted. */
   resolve(
-    itemId: string,
+    offer: LicensedOffer,
     signal: AbortSignal,
   ): Promise<{
     url: string;
@@ -33,7 +36,6 @@ export interface LicensedDownloadTransfer {
   freeBytes(): Promise<number>;
 }
 
-/** Disabled until a reviewed provider and native transfer adapter are supplied. */
 export async function importLicensedDownload({
   offer,
   provider,
@@ -62,7 +64,7 @@ export async function importLicensedDownload({
     throw new Error('Licensed download unavailable');
   }
   if (signal.aborted) throw new Error('Cancelled');
-  const resolved = await provider.resolve(offer.itemId, signal);
+  const resolved = await provider.resolve(offer, signal);
   let url: URL;
   try {
     url = new URL(resolved.url);
@@ -87,7 +89,16 @@ export async function importLicensedDownload({
     if (signal.aborted) throw new Error('Cancelled');
     const result = await importer.import(
       uri,
-      {type: 'app_download', originalFilename: offer.filename},
+      {
+        type: 'app_download',
+        originalFilename: offer.filename,
+        providerId: offer.providerId,
+        providerItemId: offer.itemId,
+        sourceUrl: offer.sourceUrl,
+        author: offer.author,
+        license: offer.license,
+        licenseUrl: offer.licenseUrl,
+      },
       signal,
     );
     return {trackId: result.track.id, duplicate: result.duplicate};

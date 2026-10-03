@@ -3,6 +3,7 @@ import {Linking} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {Button, EmptyState, Loading, Page, Surface, Text, TrackRow} from '../../design-system';
 import {
   refreshLibrary,
@@ -12,7 +13,7 @@ import {
   useServices,
   useSettings,
 } from '../../app/providers/Services';
-import type {RootStackParamList} from '../../app/navigation/types';
+import type {RootStackParamList, TabParamList} from '../../app/navigation/types';
 import {recommendLocal, type LocalRecommendation} from '../../domain/recommendations';
 import type {Track} from '../../domain/track';
 import {
@@ -23,6 +24,7 @@ import {
 export function DiscoveryScreen() {
   const {t} = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const tabs = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const services = useServices();
   const selectedId = useSelectedTrackId();
   const version = useLibraryVersion();
@@ -128,6 +130,9 @@ export function DiscoveryScreen() {
       )}
       {anchor && (
         <Surface>
+          <Text kind="title">{t('catalogRelatedTitle')}</Text>
+          <Text muted>{t('catalogRelatedBody')}</Text>
+          <Button label={t('catalogSearch')} secondary onPress={() => tabs.navigate('Downloads')} />
           <Text kind="title">{t('onlineRelatedTitle')}</Text>
           <Text muted>{t('onlineRelatedBody')}</Text>
           <Button

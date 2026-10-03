@@ -40,6 +40,7 @@ it('persists corrections on only the selected track and confirms durable playlis
   await tracks.save(other, {type: 'fixture', originalFilename: 'other'});
   await playlists.create('quiet', 'Quiet collection');
   const services = {
+    database,
     tracks,
     playlists,
     state: createAppState(defaultSettings),
@@ -70,6 +71,7 @@ it('resolves a missing song to an unavailable state instead of loading forever',
   const database = nodeTestDatabase();
   await migrate(database);
   const services = {
+    database,
     tracks: new SqliteTrackRepository(database),
     playlists: new SqlitePlaylistRepository(database),
     state: createAppState(defaultSettings),

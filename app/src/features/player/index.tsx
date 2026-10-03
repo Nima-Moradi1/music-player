@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Modal, StyleSheet, View, type GestureResponderEvent} from 'react-native';
+import {Linking, Modal, StyleSheet, View, type GestureResponderEvent} from 'react-native';
 import {useStore} from 'zustand';
 import {useTranslation} from 'react-i18next';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -349,6 +349,9 @@ export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackPara
   const version = useLibraryVersion();
   const [track, setTrack] = useState<Track | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [licensedSources, setLicensedSources] = useState<
+    Array<{author: string; license: string; sourceUrl: string; licenseUrl: string}>
+  >([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState(false);
@@ -358,11 +361,26 @@ export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackPara
     let alive = true;
     setLoading(true);
     setError(false);
-    Promise.all([services.tracks.get(route.params.trackId), services.playlists.list()])
-      .then(([song, lists]) => {
+    Promise.all([
+      services.tracks.get(route.params.trackId),
+      services.playlists.list(),
+      services.database.execute(
+        "SELECT author,license,source_url,license_url FROM track_sources WHERE track_id=? AND source_type='app_download' AND license IS NOT NULL",
+        [route.params.trackId],
+      ),
+    ])
+      .then(([song, lists, sources]) => {
         if (alive) {
           setTrack(song);
           setPlaylists(lists);
+          setLicensedSources(
+            sources.rows.map(source => ({
+              author: String(source.author),
+              license: String(source.license),
+              sourceUrl: String(source.source_url),
+              licenseUrl: String(source.license_url),
+            })),
+          );
         }
       })
       .catch(() => {
@@ -420,6 +438,27 @@ export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackPara
       <Artwork seed={track.id} uri={track.artworkPath} large />
       <Text kind="heading">{track.title}</Text>
       <Text muted>{track.artist || t('unknownArtist')}</Text>
+      {licensedSources.map(source => (
+        <Surface key={source.sourceUrl}>
+          <Text>
+            {source.author} · {source.license}
+          </Text>
+          <Button
+            label={t('catalogSource')}
+            secondary
+            onPress={() => {
+              void Linking.openURL(source.sourceUrl);
+            }}
+          />
+          <Button
+            label={t('catalogLicense')}
+            secondary
+            onPress={() => {
+              void Linking.openURL(source.licenseUrl);
+            }}
+          />
+        </Surface>
+      ))}
       <Button
         label={t('lyrics')}
         secondary

@@ -85,6 +85,50 @@ final class ManagedMedia: NSObject {
       } catch { if let target { try? self.files.removeItem(at: target) }; self.failure(error, reject) }
     }
   }
+  @objc func download(_ id: String, url: String, maxBytes: Double, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    Task.detached(priority: .utility) {
+      defer { self.finish(id) }
+      var target: URL?
+      do {
+        guard maxBytes > 0, maxBytes <= 536_870_912,
+              let source = URL(string: url), source.scheme == "https",
+              source.host == "upload.wikimedia.org" else { throw MediaError.code("PERMISSION_DENIED") }
+        var request = URLRequest(url: source)
+        request.timeoutInterval = 60
+        let (bytes, response) = try await URLSession.shared.bytes(for: request)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200,
+              response.url?.scheme == "https", response.url?.host == "upload.wikimedia.org",
+              response.expectedContentLength <= 0 || Double(response.expectedContentLength) <= maxBytes
+        else { throw MediaError.code("IMPORT_CORRUPT_FILE") }
+        let destination = try self.folder("temp").appendingPathComponent(UUID().uuidString + ".part")
+        target = destination
+        self.files.createFile(atPath: destination.path, contents: nil)
+        let output = try FileHandle(forWritingTo: destination)
+        defer { try? output.close() }
+        var chunk = Data()
+        var total = 0
+        for try await byte in bytes {
+          chunk.append(byte)
+          if chunk.count >= 65_536 {
+            try self.check(id)
+            total += chunk.count
+            guard Double(total) <= maxBytes else { throw MediaError.code("IMPORT_NO_SPACE") }
+            try output.write(contentsOf: chunk)
+            chunk.removeAll(keepingCapacity: true)
+          }
+        }
+        try self.check(id)
+        total += chunk.count
+        guard total > 0, Double(total) <= maxBytes else { throw MediaError.code("IMPORT_CORRUPT_FILE") }
+        if !chunk.isEmpty { try output.write(contentsOf: chunk) }
+        try output.synchronize()
+        resolve(destination.absoluteString)
+      } catch {
+        if let target { try? self.files.removeItem(at: target) }
+        self.failure(error, reject)
+      }
+    }
+  }
   @objc func inspect(_ id: String, path: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     Task.detached(priority: .utility) {
       defer { self.finish(id) }

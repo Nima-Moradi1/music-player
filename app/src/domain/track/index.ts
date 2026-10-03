@@ -35,6 +35,12 @@ export type TrackSource = {
   originalFilename: string;
   chatId?: string;
   messageId?: string;
+  providerId?: string;
+  providerItemId?: string;
+  sourceUrl?: string;
+  author?: string;
+  license?: string;
+  licenseUrl?: string;
 };
 export type BrowseDimension =
   | 'songs'
