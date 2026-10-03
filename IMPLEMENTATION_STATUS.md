@@ -7,7 +7,7 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [x] P1-T01 Repository structure, contract, phase docs, ADR-001, privacy/security.
 - [x] P1-T02 Public GitHub repository and isolated feature commits.
 - [x] P1-T03 RN 0.87.1 New Architecture Android/iOS project.
-- [~] P1-T04 Strict TypeScript, lint, formatting, unit/component CI; local Node 23 SQLite adapter repaired. CI Node 24 playlist deletion test exposed an unflushed asynchronous React update; the test is repaired locally and 43 tests pass on Node 24, awaiting a new CI run.
+- [~] P1-T04 Strict TypeScript, lint, formatting, unit/component CI. JavaScript CI passed on commit 41ff79f; full native workflow for current audio source remains pending.
 - [x] P1-T05 Domain contracts and stable errors.
 - [~] P1-T06 Tokens, sheets/dialogs/toasts/skeletons, native haptics, light/dark, EN/FA, RTL, motion/transparency fallbacks; iOS 27 Home/Library/Settings audits, accessibility-medium text size and Persian settings/RTL persistence pass. Screen-reader/device matrix pending.
 - [x] P1-T07 SQLite adapter, transactional migrations, repositories and settings migrations.
@@ -15,18 +15,18 @@ Statuses: `[ ]` TODO, `[~]` in progress, `[x]` verified done, `[!]` blocked, `[-
 - [~] P1-T09 Onboarding, Home, Library and all browse dimensions.
 - [~] P1-T10 Search, favorites, playlists CRUD, sorting/filtering.
 - [~] P1-T11 Manual import, 10k fixture, diagnostics, mini-player placeholder.
-- [~] P1-T12 Android debug build and native tests pass in feature CI run 37046205237 after the Kotlin haptics fix; emulator E2E was covered by a Pixel Launcher ANR dialog, and harness recovery awaits a CI rerun.
+- [~] P1-T12 Android debug build and native tests passed in feature CI run 37046205237. Run 37058805923 reached onboarding but UIAutomator returned a malformed transient dump; retry is pushed in 41ff79f, awaiting E2E rerun.
 - [x] P1-T13 iOS Debug build, iOS 27 simulator boot and two native UI tests pass after Pod target and scene-lifecycle fixes (2026-10-02).
-- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates; 43 JS tests and iOS simulator navigation/accessibility audits pass, Android current-source and screen-reader evidence pending.
+- [~] P1-T14 Accessibility/device matrix, component/E2E and 10k benchmark gates; 45 JS tests and iOS simulator navigation/accessibility audits pass, Android current-source and screen-reader evidence pending.
 
-Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/PHASE_01_FOUNDATION.md` and `docs/qa/`. Later phases remain gated by its exit; the first-session contract also prohibits Telegram/DSP work.
+Phase 1 is PARTIAL. Evidence and remaining acceptance items are in `docs/phases/PHASE_01_FOUNDATION.md` and `docs/qa/`. Physical-device and screen-reader gates cannot be marked complete from simulator evidence. Phase 2 implementation has begun at the user's request; its exit remains open.
 
 ## Phase 2 — Native audio
 
-- [ ] P2-T01 Android Media3 service, session, notification, focus/routes and typed bridge.
-- [ ] P2-T02 iOS AVFoundation, Now Playing, remote commands and interruptions.
-- [ ] P2-T03 Deterministic state, queue, progress, crash restore and resume.
-- [ ] P2-T04 Player, gestures with visible alternatives, sleep timer and A–B repeat.
+- [~] P2-T01 Media3 ExoPlayer session service, foreground permission/notification path, audio focus/noisy handling and bridge implemented; current-source Android build and device playback pending.
+- [~] P2-T02 iOS AVPlayer, playback session/background mode, Now Playing, play/pause/seek remote commands and basic interruption/route handling implemented; simulator Debug build passes, playback/device matrix pending.
+- [~] P2-T03 Persisted selected track, position and manual queue with paused restore, completion advance and 1-second progress poll; two controller tests pass. Native queue/system next, lifecycle stress and crash recovery remain open.
+- [~] P2-T04 Details and mini-player play/pause, 10-second seek, manual enqueue and next controls implemented; gestures, sleep timer and A–B repeat remain open.
 - [ ] P2-T05 Cross-platform DSP, presets, ReplayGain, artwork/Skia and visualizer.
 - [ ] P2-T06 Real-device interruption matrix, codec tests and 1h soak.
 

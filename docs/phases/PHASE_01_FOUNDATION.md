@@ -54,7 +54,7 @@ Acceptance:
 
 Tests:
 
-- 2026-10-02 local Node 23: 43 tests/16 suites, typecheck, format and lint pass; eight dynamic-style lint warnings documented. The test SQLite adapter now handles Node 22/23 without `statement.columns()`. Feature CI run 37046205237 failed a playlist deletion test on Node 24 because the async React update was outside `act`; the test fix passes all 43 tests locally under Node 24.18.0, with CI confirmation pending.
+- 2026-10-03 local: 45 tests/17 suites, typecheck, format and lint pass; eight existing dynamic-style lint warnings. JavaScript CI passed on commit 41ff79f (run 37097418040). Native lanes for current audio source are pending.
 
 ### P1-T05 — Domain contracts
 
@@ -158,7 +158,7 @@ Acceptance:
 
 Tests:
 
-- Java 21/SDK 37; x86_64 API 36.0 emulator. Feature CI run 37046205237 passed `assembleDebug testDebugUnitTest` after the Kotlin haptics fix. Emulator E2E stopped before its first app action because a system Pixel Launcher ANR dialog covered the running onboarding screen. The harness now handles that dialog, pending CI rerun. Local Gradle cannot fetch Google's SDK manifests; an isolated SDK 36/NDK 28 mirror attempt reached native module configuration but was stopped before Kotlin after prolonged configuration. Project build inputs were restored.
+- Java 21/SDK 37; x86_64 API 36.0 emulator. Feature CI run 37046205237 passed `assembleDebug testDebugUnitTest`. Run 37058805923 booted the app, but UIAutomator returned a malformed transient dump at onboarding; retry is committed in 41ff79f. Current-source Android build/E2E is pending. Local Gradle cannot fetch Google's SDK manifests; project build inputs remain unchanged.
 
 ### P1-T13 — iOS build and boot
 
@@ -184,4 +184,4 @@ Acceptance:
 
 Tests:
 
-- Desktop SQLite/Android fixture smoke and iOS simulator navigation/accessibility audits pass; Android current-source, screen-reader and physical-device evidence remain open.
+- Desktop SQLite/Android fixture smoke and iOS simulator navigation/accessibility audits pass; Android current-source, screen-reader and physical-device evidence remain open. Phase 2 code was started by explicit user request while these gates remain open.

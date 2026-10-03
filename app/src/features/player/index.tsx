@@ -91,6 +91,17 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
           />
         </Row>
       )}
+      {!active && playback.trackId && (
+        <Button
+          label={t('addToQueue')}
+          secondary
+          disabled={pending || playback.queue.includes(track.id)}
+          onPress={() => {
+            audio.enqueue(track);
+          }}
+        />
+      )}
+      {active && <Text muted>{t('queueCount', {count: playback.queue.length})}</Text>}
       {error && <Text accessibilityLiveRegion="polite">{t('playbackFailed')}</Text>}
     </Surface>
   );

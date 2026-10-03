@@ -116,6 +116,20 @@ export class PlaybackController {
     }
   }
 
+  enqueue(track: Track): void {
+    if (!track.managedPath) {
+      throw new Error('This entry has no audio file');
+    }
+    const current = this.state.getState();
+    if (!current.trackId) {
+      throw new Error('Play a song before adding to the queue');
+    }
+    if (!current.queue.includes(track.id)) {
+      this.state.setState({queue: [...current.queue, track.id]});
+      this.save();
+    }
+  }
+
   async seekTo(ms: number): Promise<void> {
     const duration = this.state.getState().durationMs;
     const positionMs = Math.max(0, Math.min(ms, duration));
