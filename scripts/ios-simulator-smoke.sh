@@ -8,7 +8,12 @@ device_id="$(xcrun simctl list devices available --json | node -e 'let data="";p
 app_path="$PWD/app/ios/build/Build/Products/Debug-iphonesimulator/MusicPlayer.app"
 bundle_id="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app_path/Info.plist")"
 metro_pid=''
+phase='simulator boot'
 cleanup() {
+  local result=$?
+  if [[ "$result" -ne 0 ]]; then
+    echo "::error title=iOS simulator smoke::Failed during $phase (exit $result)"
+  fi
   if [[ -n "$metro_pid" ]]; then kill "$metro_pid" 2>/dev/null || true; fi
   xcrun simctl shutdown "$device_id" || true
 }
@@ -16,6 +21,7 @@ trap cleanup EXIT
 
 xcrun simctl boot "$device_id"
 xcrun simctl bootstatus "$device_id" -b
+phase='Metro startup'
 pnpm --filter @music-player/app start --host 127.0.0.1 --port 8081 --max-workers 2 --no-interactive > "$artifact_dir/metro.log" 2>&1 &
 metro_pid=$!
 for attempt in {1..60}; do
@@ -24,12 +30,14 @@ for attempt in {1..60}; do
   sleep 2
 done
 curl --fail --silent http://127.0.0.1:8081/status | grep -q 'packager-status:running'
+phase='app installation and launch'
 xcrun simctl install "$device_id" "$app_path"
 xcrun simctl launch --stdout="$artifact_dir/app.stdout.log" --stderr="$artifact_dir/app.stderr.log" "$device_id" "$bundle_id"
 # Allow the first Metro compilation to finish before collecting launch evidence.
 sleep 45
 xcrun simctl io "$device_id" screenshot "$artifact_dir/onboarding.png"
 xcrun simctl spawn "$device_id" log show --last 2m --style compact --predicate 'process == "MusicPlayer"' > "$artifact_dir/native.log"
+phase='launch survival and crash-log check'
 xcrun simctl spawn "$device_id" launchctl list > "$artifact_dir/launchctl.txt"
 if ! grep -Fq "UIKitApplication:$bundle_id" "$artifact_dir/launchctl.txt"; then
   echo "App process exited before the smoke check" >&2
@@ -39,6 +47,7 @@ if grep -E 'Unhandled JS Exception|RCTFatal|Invalid hook call|Terminating app du
   exit 1
 fi
 result_bundle="$artifact_dir/foundation-ui-$(date +%Y%m%d%H%M%S).xcresult"
+phase='Foundation UI tests'
 if ! xcodebuild \
   -workspace app/ios/MusicPlayer.xcworkspace \
   -scheme MusicPlayer \
@@ -52,6 +61,16 @@ if ! xcodebuild \
   tail -n 160 "$artifact_dir/foundation-ui.log" >&2
   if [[ -d "$result_bundle" ]] && xcrun xcresulttool get test-results summary --path "$result_bundle" > "$artifact_dir/foundation-summary.json" 2>/dev/null; then
     cat "$artifact_dir/foundation-summary.json" >&2
+    node - "$artifact_dir/foundation-summary.json" <<'NODE'
+const fs = require('fs');
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+for (const failure of Array.isArray(result.testFailures) ? result.testFailures : []) {
+  const message = [failure.testIdentifier, failure.failureText].filter(Boolean).join(': ');
+  if (message) {
+    console.log(`::error title=iOS Foundation UI test::${message.slice(0, 1000).replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`);
+  }
+}
+NODE
   fi
   while IFS= read -r failure; do
     failure="${failure//'%'/'%25'}"
