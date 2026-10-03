@@ -9,6 +9,7 @@ import type {Database} from '../../infrastructure/database/contracts';
 import type {PlaybackController} from '../../domain/playback/PlaybackController';
 import {
   defaultTelegramPolicy,
+  parseTelegramPolicy,
   type TelegramPolicy,
   type TelegramPolicyRepository,
 } from '../../domain/telegram/policy';
@@ -64,7 +65,10 @@ export function useTelegramPolicy() {
 }
 export function updateTelegramPolicy(services: Services, changes: Partial<TelegramPolicy>) {
   try {
-    const telegramPolicy = {...services.state.getState().telegramPolicy, ...changes};
+    const telegramPolicy = parseTelegramPolicy({
+      ...services.state.getState().telegramPolicy,
+      ...changes,
+    });
     services.telegramPreferences.write(telegramPolicy);
     services.state.setState({telegramPolicy, lastError: null});
   } catch {

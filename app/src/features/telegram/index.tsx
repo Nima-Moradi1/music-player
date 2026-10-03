@@ -4,7 +4,7 @@ import {Page, Surface, Text, Toggle} from '../../design-system';
 import {updateTelegramPolicy, useServices, useTelegramPolicy} from '../../app/providers/Services';
 import type {TelegramPolicy} from '../../domain/telegram/policy';
 
-const sourceKeys = ['savedMessages', 'privateChats', 'channels', 'groups'] as const;
+const sourceKeys = ['savedMessages', 'privateChats'] as const;
 const transferKeys = ['autoImport', 'wifiOnly', 'paused'] as const;
 
 export function TelegramSettingsScreen() {
@@ -22,6 +22,7 @@ export function TelegramSettingsScreen() {
         <Text muted>{t('telegramConnectUnavailable')}</Text>
       </Surface>
       <Text kind="title">{t('telegramSources')}</Text>
+      <Text muted>{t('telegramScope')}</Text>
       <Surface>
         {sourceKeys.map(key => (
           <Toggle

@@ -12,6 +12,8 @@ export type PlayerState = {
   positionMs: number;
   durationMs: number;
   queue: string[];
+  unshuffledQueue: string[];
+  shuffle: boolean;
   repeatMode: 'off' | 'one' | 'all';
   rate: 1 | 1.25 | 1.5 | 2;
   sleepUntilMs: number | null;
@@ -29,6 +31,8 @@ const empty: PlayerState = {
   positionMs: 0,
   durationMs: 0,
   queue: [],
+  unshuffledQueue: [],
+  shuffle: false,
   repeatMode: 'off',
   rate: 1,
   sleepUntilMs: null,
@@ -49,8 +53,12 @@ export class PlaybackController {
   ) {}
 
   private save() {
-    const {trackId, positionMs, queue, repeatMode, rate} = this.state.getState();
-    this.storage.set('resume', JSON.stringify({trackId, positionMs, queue, repeatMode, rate}));
+    const {trackId, positionMs, queue, unshuffledQueue, shuffle, repeatMode, rate} =
+      this.state.getState();
+    this.storage.set(
+      'resume',
+      JSON.stringify({trackId, positionMs, queue, unshuffledQueue, shuffle, repeatMode, rate}),
+    );
   }
 
   async restore(): Promise<void> {
@@ -59,6 +67,8 @@ export class PlaybackController {
         trackId?: string;
         positionMs?: number;
         queue?: string[];
+        unshuffledQueue?: string[];
+        shuffle?: boolean;
         repeatMode?: PlayerState['repeatMode'];
         rate?: PlayerState['rate'];
       } | null;
@@ -77,13 +87,21 @@ export class PlaybackController {
       if (positionMs) {
         await this.native.seekTo(positionMs);
       }
+      const queue = [...new Set((saved.queue ?? []).filter(id => typeof id === 'string'))];
+      if (!queue.includes(track.id)) queue.unshift(track.id);
+      const unshuffledQueue = [
+        ...new Set((saved.unshuffledQueue ?? queue).filter(id => typeof id === 'string')),
+      ];
+      if (!unshuffledQueue.includes(track.id)) unshuffledQueue.unshift(track.id);
       this.state.setState({
         trackId: track.id,
         title: track.title,
         artist: track.artist,
         positionMs,
         durationMs: track.durationMs,
-        queue: saved.queue?.filter(id => typeof id === 'string') ?? [track.id],
+        queue,
+        unshuffledQueue,
+        shuffle: saved.shuffle === true,
         repeatMode:
           saved.repeatMode === 'one' || saved.repeatMode === 'all' ? saved.repeatMode : 'off',
         rate,
@@ -94,13 +112,14 @@ export class PlaybackController {
     }
   }
 
-  async load(track: Track, queue: string[] = [track.id]): Promise<void> {
+  async load(track: Track, queue: string[] = [track.id], preserveOrder = false): Promise<void> {
     if (!track.managedPath) {
       throw new Error('This entry has no audio file');
     }
     await this.native.load(track.managedPath, track.title, track.artist);
     await this.native.setRate(this.state.getState().rate);
     await this.native.setABRepeat(-1, -1);
+    const activeQueue = queue.includes(track.id) ? queue : [track.id, ...queue];
     this.state.setState({
       trackId: track.id,
       title: track.title,
@@ -109,7 +128,9 @@ export class PlaybackController {
       ended: false,
       positionMs: 0,
       durationMs: track.durationMs,
-      queue: queue.includes(track.id) ? queue : [track.id, ...queue],
+      queue: activeQueue,
+      unshuffledQueue: preserveOrder ? this.state.getState().unshuffledQueue : activeQueue,
+      shuffle: preserveOrder ? this.state.getState().shuffle : false,
       repeatStartMs: null,
       repeatEndMs: null,
       error: null,
@@ -157,9 +178,43 @@ export class PlaybackController {
       throw new Error('Play a song before adding to the queue');
     }
     if (!current.queue.includes(track.id)) {
-      this.state.setState({queue: [...current.queue, track.id]});
+      this.state.setState({
+        queue: [...current.queue, track.id],
+        unshuffledQueue: [...current.unshuffledQueue, track.id],
+      });
       this.save();
     }
+  }
+
+  removeFromQueue(trackId: string): void {
+    const current = this.state.getState();
+    if (trackId === current.trackId) return;
+    this.state.setState({
+      queue: current.queue.filter(id => id !== trackId),
+      unshuffledQueue: current.unshuffledQueue.filter(id => id !== trackId),
+    });
+    this.save();
+  }
+
+  setShuffle(enabled: boolean): void {
+    const current = this.state.getState();
+    if (current.shuffle === enabled) return;
+    if (!enabled) {
+      this.state.setState({queue: current.unshuffledQueue, shuffle: false});
+    } else {
+      const index = Math.max(0, current.queue.indexOf(current.trackId ?? ''));
+      const upcoming = current.queue.slice(index + 1);
+      for (let i = upcoming.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [upcoming[i], upcoming[j]] = [upcoming[j]!, upcoming[i]!];
+      }
+      this.state.setState({
+        queue: [...current.queue.slice(0, index + 1), ...upcoming],
+        unshuffledQueue: current.queue,
+        shuffle: true,
+      });
+    }
+    this.save();
   }
 
   async setSleepTimer(minutes: number): Promise<void> {
@@ -212,16 +267,11 @@ export class PlaybackController {
     }
     const track = await this.tracks.get(previousId);
     if (!track?.managedPath) {
-      this.state.setState({queue: queue.filter(id => id !== previousId)});
-      this.save();
+      this.removeFromQueue(previousId);
       return this.previous();
     }
     const wasPlaying = this.state.getState().playing;
-    await this.load(track, this.state.getState().queue);
-    if (wasPlaying) {
-      await this.native.play();
-      this.state.setState({playing: true});
-    }
+    await this.skipTo(previousId, wasPlaying);
   }
 
   async next(automatic = false): Promise<void> {
@@ -247,12 +297,25 @@ export class PlaybackController {
     }
     const track = await this.tracks.get(nextId);
     if (!track?.managedPath) {
-      this.state.setState({queue: queue.filter(id => id !== nextId)});
+      this.removeFromQueue(nextId);
       return this.next(automatic);
     }
-    await this.load(track, queue);
-    await this.native.play();
-    this.state.setState({playing: true});
+    await this.skipTo(nextId);
+  }
+
+  async skipTo(trackId: string, autoplay = true): Promise<void> {
+    const queue = this.state.getState().queue;
+    if (!queue.includes(trackId)) throw new Error('Track is not in the queue');
+    const track = await this.tracks.get(trackId);
+    if (!track?.managedPath) {
+      this.removeFromQueue(trackId);
+      throw new Error('Queued track is unavailable');
+    }
+    await this.load(track, queue, true);
+    if (autoplay) {
+      await this.native.play();
+      this.state.setState({playing: true});
+    }
   }
 
   private startPolling() {

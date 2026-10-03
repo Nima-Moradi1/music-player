@@ -6,7 +6,7 @@ export class SqliteLyricsRepository implements LyricsRepository {
 
   async getLocal(trackId: string): Promise<LyricsDocument | null> {
     const result = await this.database.execute(
-      "SELECT id,text,offset_ms,license FROM lyrics WHERE track_id=? AND provider='manual' LIMIT 1",
+      "SELECT id,text,offset_ms,license FROM lyrics WHERE track_id=? AND provider IN ('manual','embedded') ORDER BY CASE provider WHEN 'manual' THEN 0 ELSE 1 END LIMIT 1",
       [trackId],
     );
     const row = result.rows[0];
@@ -25,6 +25,20 @@ export class SqliteLyricsRepository implements LyricsRepository {
   }
 
   async saveLocal(trackId: string, text: string, offsetMs: number): Promise<LyricsDocument> {
+    return this.save(trackId, text, offsetMs, 'manual', 'user-supplied');
+  }
+
+  async saveEmbedded(trackId: string, text: string): Promise<LyricsDocument> {
+    return this.save(trackId, text, 0, 'embedded', 'embedded-in-user-file');
+  }
+
+  private async save(
+    trackId: string,
+    text: string,
+    offsetMs: number,
+    provider: 'manual' | 'embedded',
+    license: string,
+  ): Promise<LyricsDocument> {
     if (
       !text.trim() ||
       text.length > 100_000 ||
@@ -33,13 +47,13 @@ export class SqliteLyricsRepository implements LyricsRepository {
     ) {
       throw new Error('Invalid local lyrics');
     }
-    const id = `manual:${trackId}`;
+    const id = `${provider}:${trackId}`;
     const lines = parseLrc(text);
     await this.database.transaction(async session => {
       await session.execute('DELETE FROM lyrics WHERE id=?', [id]);
       await session.execute(
         'INSERT INTO lyrics (id,track_id,provider,text,offset_ms,license,cached_at) VALUES (?,?,?,?,?,?,?)',
-        [id, trackId, 'manual', text, offsetMs, 'user-supplied', Date.now()],
+        [id, trackId, provider, text, offsetMs, license, Date.now()],
       );
       for (let position = 0; position < lines.length; position++) {
         await session.execute(
@@ -48,6 +62,6 @@ export class SqliteLyricsRepository implements LyricsRepository {
         );
       }
     });
-    return {id, text, lines, offsetMs, license: 'user-supplied'};
+    return {id, text, lines, offsetMs, license};
   }
 }

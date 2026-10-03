@@ -2,6 +2,7 @@ import type {ImportJournal, ManagedFilesystem, MediaImporter} from './index';
 import type {TrackRepository, TrackSource} from '../track';
 import {classifyLanguage, normalizeSearch} from '../track/normalize';
 import {AppError} from '../../shared/errors';
+import type {LyricsRepository} from '../lyrics';
 
 export class ImportMedia implements MediaImporter {
   private tail: Promise<unknown> = Promise.resolve();
@@ -11,6 +12,7 @@ export class ImportMedia implements MediaImporter {
     private readonly createId: () => Promise<string>,
     private readonly maxBytes: () => number,
     private readonly journal?: ImportJournal,
+    private readonly lyrics?: Pick<LyricsRepository, 'saveEmbedded'>,
   ) {}
   import(uri: string, source: TrackSource, signal: AbortSignal) {
     const work = () => this.execute(uri, source, signal);
@@ -85,6 +87,11 @@ export class ImportMedia implements MediaImporter {
       committed = true;
       promoted = null;
       artwork = null;
+      if (media.embeddedLyrics?.trim()) {
+        // Lyrics are an optional cache. An extraction/cache failure must not
+        // roll back a successfully committed audio file.
+        await this.lyrics?.saveEmbedded(track.id, media.embeddedLyrics).catch(() => undefined);
+      }
       await this.journal?.finish(jobId, track.id, null);
       return {track, duplicate: false};
     } catch (error) {

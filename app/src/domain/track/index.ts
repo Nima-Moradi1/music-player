@@ -64,6 +64,8 @@ export interface TrackRepository {
   collections(dimension: BrowseDimension): Promise<Collection[]>;
   get(id: string): Promise<Track | null>;
   findByHash(hash: string): Promise<Track | null>;
+  firstPlayable(favoritesOnly?: boolean): Promise<Track | null>;
+  relatedCandidates(anchor: Track, limit?: number): Promise<Track[]>;
   save(track: Track, source: TrackSource): Promise<void>;
   addSource(trackId: string, source: TrackSource): Promise<void>;
   setFavorite(id: string, favorite: boolean): Promise<void>;

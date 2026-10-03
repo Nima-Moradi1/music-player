@@ -26,6 +26,8 @@ The flow asserts native UI and persisted SQLite/media behavior:
 
 The flow does not establish physical-device performance, screen-reader traversal, every adaptive layout, insufficient-storage behavior, or iOS interaction. These remain separate checks in [DEVICE_MATRIX.md](DEVICE_MATRIX.md). The existing iOS simulator launch smoke continues to capture boot logs and onboarding screenshots.
 
+GitHub run `37100739974` completed with JavaScript success and failures in **Android Native import and library E2E** and **iOS Simulator launch smoke**. The public Actions API exposes these job conclusions but requires authenticated access to their logs/artifacts. The exact failing assertions are unknown; do not mark either gate green until the logs are reviewed and the current source is rerun.
+
 ## Environment observed on 2026-10-02
 
 The local Mac has full Xcode and an iOS 27 simulator runtime, although its default developer directory points at Command Line Tools. Use `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` for local Xcode commands. Android Studio provides Java 21 at `/Applications/Android Studio.app/Contents/jbr/Contents/Home`; adb/emulator are under `~/Library/Android/sdk`. A disposable `Medium_Phone_API_36.1` emulator booted successfully. The installed local Android platform/build-tools/NDK do not match the project's pinned API 37/build-tools 37/NDK 27 configuration, so the current native APK is supplied by CI instead of silently changing build inputs. Runtime acceptance status is recorded only after the runner completes against that APK.

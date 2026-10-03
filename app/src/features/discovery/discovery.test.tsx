@@ -38,3 +38,19 @@ it('shows local related music with its reason and opens the stored track', async
   screen.unmount();
   database.close();
 });
+
+it('finds matching playable songs beyond the first title page', async () => {
+  const database = nodeTestDatabase();
+  await migrate(database);
+  const tracks = new SqliteTrackRepository(database);
+  const anchor = {...fixtureTrack(1), artist: 'Target', managedPath: 'file:///anchor.mp3'};
+  const related = {...fixtureTrack(2), artist: 'Target', managedPath: 'file:///related.mp3'};
+  await tracks.save(anchor, {type: 'manual_import', originalFilename: 'anchor.mp3'});
+  for (let index = 10; index < 215; index++) {
+    const unrelated = {...fixtureTrack(index), genre: 'Other', album: 'Other'};
+    await tracks.save(unrelated, {type: 'fixture', originalFilename: `fixture-${index}`});
+  }
+  await tracks.save(related, {type: 'manual_import', originalFilename: 'related.mp3'});
+  expect((await tracks.relatedCandidates(anchor)).map(track => track.id)).toContain(related.id);
+  database.close();
+});

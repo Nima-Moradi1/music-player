@@ -29,7 +29,7 @@ export const defaultTelegramPolicy: TelegramPolicy = {
   consent: false,
   savedMessages: true,
   privateChats: true,
-  channels: true,
+  channels: false,
   groups: false,
   autoImport: true,
   paused: false,
@@ -40,7 +40,10 @@ export const defaultTelegramPolicy: TelegramPolicy = {
 };
 export function parseTelegramPolicy(value: unknown): TelegramPolicy {
   const result = telegramPolicySchema.safeParse(value);
-  return result.success ? result.data : {...defaultTelegramPolicy};
+  // Channel/group imports require additional product and terms work.
+  return result.success
+    ? {...result.data, channels: false, groups: false}
+    : {...defaultTelegramPolicy};
 }
 export interface TelegramPolicyRepository {
   read(): TelegramPolicy;

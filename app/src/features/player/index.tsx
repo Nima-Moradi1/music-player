@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {StyleSheet} from 'react-native';
+import {Modal, StyleSheet, View, type GestureResponderEvent} from 'react-native';
 import {useStore} from 'zustand';
 import {useTranslation} from 'react-i18next';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -15,6 +15,7 @@ import {
   Text,
   EmptyState,
   tokens,
+  useTheme,
 } from '../../design-system';
 import {refreshLibrary, useLibraryVersion, useServices} from '../../app/providers/Services';
 import type {RootStackParamList} from '../../app/navigation/types';
@@ -26,12 +27,141 @@ function clock(ms: number) {
   return `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
 }
 
+function SeekBar({
+  positionMs,
+  durationMs,
+  disabled,
+  onSeek,
+}: {
+  positionMs: number;
+  durationMs: number;
+  disabled: boolean;
+  onSeek: (ms: number) => void;
+}) {
+  const {colors, rtl} = useTheme();
+  const {t} = useTranslation();
+  const [width, setWidth] = useState(1);
+  const [preview, setPreview] = useState<number | null>(null);
+  const position = preview ?? positionMs;
+  function value(event: GestureResponderEvent) {
+    const fraction = Math.max(0, Math.min(1, event.nativeEvent.locationX / width));
+    return Math.round((rtl ? 1 - fraction : fraction) * durationMs);
+  }
+  return (
+    <View
+      accessible
+      accessibilityRole="adjustable"
+      accessibilityLabel={t('seekPosition')}
+      accessibilityValue={{min: 0, max: durationMs, now: position}}
+      accessibilityActions={[{name: 'increment'}, {name: 'decrement'}]}
+      onAccessibilityAction={event => {
+        if (disabled) return;
+        const delta = event.nativeEvent.actionName === 'increment' ? 10000 : -10000;
+        onSeek(Math.max(0, Math.min(durationMs, position + delta)));
+      }}
+      onLayout={event => setWidth(Math.max(1, event.nativeEvent.layout.width))}
+      onStartShouldSetResponder={() => !disabled && durationMs > 0}
+      onMoveShouldSetResponder={() => !disabled && durationMs > 0}
+      onResponderGrant={event => setPreview(value(event))}
+      onResponderMove={event => setPreview(value(event))}
+      onResponderRelease={event => {
+        onSeek(value(event));
+        setPreview(null);
+      }}
+      onResponderTerminate={() => setPreview(null)}
+      style={[styles.seekTrack, {backgroundColor: colors.elevated}]}
+    >
+      <View
+        pointerEvents="none"
+        style={[
+          styles.seekFill,
+          {
+            width: `${durationMs ? (100 * position) / durationMs : 0}%`,
+            backgroundColor: colors.accent,
+          },
+          rtl ? styles.seekRight : styles.seekLeft,
+        ]}
+      />
+    </View>
+  );
+}
+
+function QueueSheet({
+  audio,
+  visible,
+  close,
+}: {
+  audio: PlaybackController;
+  visible: boolean;
+  close: () => void;
+}) {
+  const {t} = useTranslation();
+  const playback = useStore(audio.state);
+  const {tracks} = useServices();
+  const [titles, setTitles] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!visible) return;
+    let alive = true;
+    Promise.all(playback.queue.map(id => tracks.get(id)))
+      .then(items => {
+        if (alive) {
+          setTitles(
+            Object.fromEntries(items.filter(Boolean).map(track => [track!.id, track!.title])),
+          );
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [visible, playback.queue, tracks]);
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={close}
+    >
+      <Page>
+        <Text kind="heading">{t('playQueue')}</Text>
+        <Button label={t('close')} secondary onPress={close} />
+        {playback.queue.map(id => (
+          <Surface key={id}>
+            <Text kind="title">
+              {titles[id] ?? (id === playback.trackId ? playback.title : t('loading'))}
+            </Text>
+            <Row style={styles.controls}>
+              <Button
+                label={id === playback.trackId ? t('nowPlaying') : t('play')}
+                disabled={id === playback.trackId}
+                onPress={() => {
+                  void audio
+                    .skipTo(id)
+                    .then(close)
+                    .catch(() => undefined);
+                }}
+              />
+              <Button
+                label={t('removeFromQueue')}
+                secondary
+                disabled={id === playback.trackId}
+                onPress={() => audio.removeFromQueue(id)}
+              />
+            </Row>
+          </Surface>
+        ))}
+      </Page>
+    </Modal>
+  );
+}
+
 function PlayerControls({audio, track}: {audio: PlaybackController; track: Track}) {
   const {t} = useTranslation();
   const playback = useStore(audio.state);
   const active = playback.trackId === track.id;
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
+  const [queueOpen, setQueueOpen] = useState(false);
   async function action(work: () => Promise<void>) {
     if (pending) {
       return;
@@ -54,6 +184,16 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
           ? `${clock(playback.positionMs)} / ${clock(playback.durationMs)}`
           : clock(track.durationMs)}
       </Text>
+      {active && (
+        <SeekBar
+          positionMs={playback.positionMs}
+          durationMs={playback.durationMs}
+          disabled={pending}
+          onSeek={ms => {
+            void action(() => audio.seekTo(ms));
+          }}
+        />
+      )}
       <Row style={styles.controls}>
         <Button
           label={active && playback.playing ? t('pause') : t('play')}
@@ -111,7 +251,21 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
           }}
         />
       )}
-      {active && <Text muted>{t('queueCount', {count: playback.queue.length})}</Text>}
+      {active && (
+        <Button
+          label={t('queueCount', {count: playback.queue.length})}
+          secondary
+          onPress={() => setQueueOpen(true)}
+        />
+      )}
+      {active && (
+        <Button
+          label={t('shuffle')}
+          secondary={!playback.shuffle}
+          selected={playback.shuffle}
+          onPress={() => audio.setShuffle(!playback.shuffle)}
+        />
+      )}
       {active && (
         <Button
           label={t(`repeat_${playback.repeatMode}`)}
@@ -184,6 +338,7 @@ function PlayerControls({audio, track}: {audio: PlaybackController; track: Track
         </Row>
       )}
       {error && <Text accessibilityLiveRegion="polite">{t('playbackFailed')}</Text>}
+      <QueueSheet audio={audio} visible={queueOpen} close={() => setQueueOpen(false)} />
     </Surface>
   );
 }
@@ -350,6 +505,15 @@ export function TrackDetailsScreen({route}: NativeStackScreenProps<RootStackPara
 
 const styles = StyleSheet.create({
   controls: {flexWrap: 'wrap'},
+  seekTrack: {
+    height: tokens.size.touch,
+    justifyContent: 'center',
+    borderRadius: tokens.radius.small,
+    overflow: 'hidden',
+  },
+  seekFill: {height: 8, borderRadius: tokens.radius.pill},
+  seekLeft: {alignSelf: 'flex-start'},
+  seekRight: {alignSelf: 'flex-end'},
   metadata: {flexWrap: 'wrap', gap: tokens.spacing.sm},
   value: {flexShrink: 1},
 });

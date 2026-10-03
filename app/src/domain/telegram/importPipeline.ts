@@ -36,6 +36,7 @@ export async function importTelegramCandidate({
   if (
     !policy.consent ||
     policy.paused ||
+    (candidate.chatKind !== 'savedMessages' && candidate.chatKind !== 'privateChats') ||
     policy.excludedChatIds.includes(candidate.chatId) ||
     !eligibleFile(candidate, policy)
   ) {

@@ -66,6 +66,7 @@ export function LyricsScreen({route}: NativeStackScreenProps<RootStackParamList,
     <Page>
       <Text kind="heading">{t('lyrics')}</Text>
       <Text muted>{t('lyricsLocalBody')}</Text>
+      {document?.license === 'embedded-in-user-file' && <Text muted>{t('lyricsEmbedded')}</Text>}
       {loading ? (
         <Loading label={t('loading')} />
       ) : (

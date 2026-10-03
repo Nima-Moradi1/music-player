@@ -108,6 +108,7 @@ class ManagedMediaModule(private val context: ReactApplicationContext) : ReactCo
         put("album", metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) ?: "")
         put("genre", metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE) ?: "")
         put("durationMs", duration); put("artworkPath", extractArtwork(metadata.embeddedPicture, hash) ?: JSONObject.NULL)
+        if (extension == "mp3") EmbeddedLyrics.read(file)?.let { put("embeddedLyrics", it) }
       }.toString()
     } finally { metadata.release() }
   }

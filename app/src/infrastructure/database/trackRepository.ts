@@ -126,6 +126,27 @@ export class SqliteTrackRepository implements TrackRepository {
     const result = await this.database.execute(`${selectTrack} WHERE t.content_hash=?`, [hash]);
     return result.rows[0] ? mapTrack(result.rows[0]) : null;
   }
+  async firstPlayable(favoritesOnly = false): Promise<Track | null> {
+    const result = await this.database.execute(
+      `${selectTrack} WHERE t.managed_path IS NOT NULL${favoritesOnly ? ' AND EXISTS (SELECT 1 FROM favorites f WHERE f.track_id=t.id)' : ''} ORDER BY t.created_at DESC,t.id LIMIT 1`,
+    );
+    return result.rows[0] ? mapTrack(result.rows[0]) : null;
+  }
+  async relatedCandidates(anchor: Track, limit = 200): Promise<Track[]> {
+    const artist = normalizeSearch(anchor.artist);
+    const album = normalizeSearch(anchor.album);
+    const genre = anchor.genre.trim();
+    if (!artist && !album && !genre) return [];
+    const result = await this.database.execute(
+      `${selectTrack} WHERE t.id<>? AND t.managed_path IS NOT NULL AND (
+        (?<>'' AND EXISTS (SELECT 1 FROM track_artists ta JOIN artists ar ON ar.id=ta.artist_id WHERE ta.track_id=t.id AND ar.normalized_name=?))
+        OR (?<>'' AND a.normalized_title=?)
+        OR (?<>'' AND EXISTS (SELECT 1 FROM track_genres tg JOIN genres g ON g.id=tg.genre_id WHERE tg.track_id=t.id AND g.name=? COLLATE NOCASE))
+      ) ORDER BY t.created_at DESC,t.id LIMIT ?`,
+      [anchor.id, artist, artist, album, album, genre, genre, Math.max(1, Math.min(limit, 200))],
+    );
+    return result.rows.map(mapTrack);
+  }
   async collections(dimension: BrowseDimension): Promise<Collection[]> {
     const queries: Partial<Record<BrowseDimension, string>> = {
       artists:

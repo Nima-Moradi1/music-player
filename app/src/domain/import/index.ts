@@ -65,6 +65,7 @@ export type InspectedMedia = {
   genre: string;
   durationMs: number;
   artworkPath: string | null;
+  embeddedLyrics?: string | undefined;
   metadataLanguage?: string;
 };
 export interface ManagedFilesystem {

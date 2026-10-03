@@ -22,9 +22,12 @@ it('discloses unavailable connection and saves explicit source and consent choic
     </ServicesProvider>,
   );
   expect(screen.getByText(/Connection is unavailable/)).toBeOnTheScreen();
-  fireEvent.press(screen.getByRole('switch', {name: 'Groups'}));
+  expect(screen.queryByRole('switch', {name: 'Groups'})).toBeNull();
+  fireEvent.press(screen.getByRole('switch', {name: 'Private chats'}));
   fireEvent.press(
     screen.getByRole('switch', {name: 'Allow scanning of selected sources when connected'}),
   );
-  expect(write).toHaveBeenLastCalledWith(expect.objectContaining({groups: true, consent: true}));
+  expect(write).toHaveBeenLastCalledWith(
+    expect.objectContaining({privateChats: false, consent: true, channels: false, groups: false}),
+  );
 });

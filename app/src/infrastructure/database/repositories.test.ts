@@ -1,4 +1,4 @@
-import {migrate} from './migrations';
+import {migrate, migrations} from './migrations';
 import {SqliteTrackRepository} from './trackRepository';
 import {SqlitePlaylistRepository} from './playlistRepository';
 import {nodeTestDatabase} from '../../testing/nodeDatabase';
@@ -19,7 +19,9 @@ describe('SQLite integration', () => {
     await migrate(db);
     const result = await db.execute("SELECT name FROM sqlite_master WHERE type='table'");
     expect(result.rows).toHaveLength(21);
-    expect((await db.execute('SELECT version FROM schema_migrations')).rows).toHaveLength(2);
+    expect((await db.execute('SELECT version FROM schema_migrations')).rows).toHaveLength(
+      migrations.length,
+    );
   });
   it('rolls back a failed migration and rejects a newer schema', async () => {
     await db.execute('INSERT INTO schema_migrations VALUES (99,0)');

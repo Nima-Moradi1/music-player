@@ -109,6 +109,14 @@ final class ManagedMedia: NSObject {
         let video = try await asset.loadTracks(withMediaType: .video)
         guard !audio.isEmpty, video.isEmpty, duration.seconds.isFinite, duration.seconds > 0 else { throw MediaError.code("IMPORT_CORRUPT_FILE") }
         let metadata = try await asset.load(.commonMetadata)
+        let allMetadata = (try? await asset.load(.metadata)) ?? []
+        var embeddedLyrics: String?
+        if let item = allMetadata.first(where: { $0.identifier?.rawValue.localizedCaseInsensitiveContains("lyric") == true }),
+           let text = try? await item.load(.stringValue),
+           !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+           text.utf8.count <= 100_000 {
+          embeddedLyrics = text
+        }
         func value(_ key: AVMetadataKey) async -> String {
           guard let item = metadata.first(where: { $0.commonKey == key }) else { return "" }
           return (try? await item.load(.stringValue)) ?? ""
@@ -120,10 +128,11 @@ final class ManagedMedia: NSObject {
            let data = try? await item.load(.dataValue), data.count <= 8 * 1024 * 1024 {
           artwork = try self.extractArtwork(data, hash: digest)
         }
-        let object: [String: Any] = ["path": path, "sha256": digest,
+        var object: [String: Any] = ["path": path, "sha256": digest,
           "mimeType": mime, "extension": ext, "fileSize": size, "durationMs": Int(duration.seconds * 1000),
           "title": await value(.commonKeyTitle), "artist": await value(.commonKeyArtist), "album": await value(.commonKeyAlbumName),
           "genre": await value(.commonKeyType), "artworkPath": artwork as Any? ?? NSNull()]
+        if let embeddedLyrics { object["embeddedLyrics"] = embeddedLyrics }
         try self.check(id)
         resolve(String(data: try JSONSerialization.data(withJSONObject: object), encoding: .utf8))
       } catch { self.failure(error, reject) }

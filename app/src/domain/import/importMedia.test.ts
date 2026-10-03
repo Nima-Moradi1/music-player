@@ -28,6 +28,8 @@ describe('managed import transaction', () => {
     };
     const tracks: jest.Mocked<TrackRepository> = {
       findByHash: jest.fn().mockResolvedValue(existing ? track : null),
+      firstPlayable: jest.fn(),
+      relatedCandidates: jest.fn(),
       save: jest.fn().mockResolvedValue(undefined),
       addSource: jest.fn().mockResolvedValue(undefined),
       list: jest.fn(),

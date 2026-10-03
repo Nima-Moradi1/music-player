@@ -13,6 +13,7 @@ import {createAppState, type Services} from '../providers/Services';
 import {nativeAudio} from '../../native/NativeAudio';
 import {PlaybackController} from '../../domain/playback/PlaybackController';
 import {MMKVTelegramPolicyRepository} from '../../infrastructure/telegram/policyRepository';
+import {SqliteLyricsRepository} from '../../infrastructure/database/lyricsRepository';
 let ready: Promise<Services> | null = null;
 export function bootstrap(): Promise<Services> {
   if (ready) {
@@ -56,6 +57,7 @@ async function initialize(): Promise<Services> {
         () => bridge.createId(),
         () => state.getState().settings.maxImportBytes,
         journal,
+        new SqliteLyricsRepository(database),
       ),
     };
   } catch (error) {

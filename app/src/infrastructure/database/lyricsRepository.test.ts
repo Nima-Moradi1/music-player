@@ -14,6 +14,8 @@ it('stores local synced lyrics and offset without a network provider', async () 
   });
   const lyrics = new SqliteLyricsRepository(database);
   expect(await lyrics.getLocal(track.id)).toBeNull();
+  await lyrics.saveEmbedded(track.id, '[00:01.00]Embedded');
+  expect((await lyrics.getLocal(track.id))?.license).toBe('embedded-in-user-file');
   await lyrics.saveLocal(track.id, '[00:01.00]First\n[00:03.00]Second', 500);
   expect(await lyrics.getLocal(track.id)).toEqual({
     id: `manual:${track.id}`,

@@ -184,4 +184,4 @@ Acceptance:
 
 Tests:
 
-- Desktop SQLite/Android fixture smoke and current iOS 27 simulator navigation/accessibility/Persian audits pass. The complete `ios-simulator-smoke.sh` path passed on 2026-10-03 after a bounded Settings-tap retry: 3 UI tests, zero failures. Android current-source, screen-reader and physical-device evidence remain open. Phase 2 code was started by explicit user request while these gates remain open.
+- Desktop SQLite/Android fixture smoke and an earlier iOS 27 simulator navigation/accessibility/Persian audit passed. The complete `ios-simulator-smoke.sh` path passed on 2026-10-03 after a bounded Settings-tap retry: 3 UI tests, zero failures. Run 37100739974 subsequently failed iOS launch smoke; current-source Android/iOS, screen-reader and physical-device evidence remain open. Phase 2 code was started by explicit user request while these gates remain open.

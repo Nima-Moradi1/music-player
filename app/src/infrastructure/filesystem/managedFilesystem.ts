@@ -14,6 +14,7 @@ const inspectionSchema = z.object({
   genre: z.string(),
   durationMs: z.number().positive(),
   artworkPath: z.string().nullable(),
+  embeddedLyrics: z.string().max(100_000).optional(),
 });
 export function aborted(): Error {
   const error = new Error('Cancelled');

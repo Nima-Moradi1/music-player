@@ -155,3 +155,19 @@ it('restores playback speed and delegates changes while paused', async () => {
   expect(restored.state.getState().rate).toBe(1.5);
   expect(native.setRate).toHaveBeenLastCalledWith(1.5);
 });
+
+it('persists shuffle and restores the manual queue when shuffle is turned off', async () => {
+  jest.useFakeTimers();
+  const {first, second, native, tracks, controller} = setup();
+  await controller.playTrack(first);
+  controller.enqueue(second);
+  controller.setShuffle(true);
+  expect(controller.state.getState().shuffle).toBe(true);
+  const restored = new PlaybackController(native, tracks);
+  await restored.restore();
+  expect(restored.state.getState().shuffle).toBe(true);
+  restored.setShuffle(false);
+  expect(restored.state.getState().queue).toEqual([first.id, second.id]);
+  restored.removeFromQueue(second.id);
+  expect(JSON.parse(mockSaved.get('resume') ?? '{}').queue).toEqual([first.id]);
+});

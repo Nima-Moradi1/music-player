@@ -30,12 +30,13 @@ export function DiscoveryScreen() {
     setError(false);
     Promise.all([
       selectedId ? services.tracks.get(selectedId) : Promise.resolve(null),
-      services.tracks.list({dimension: 'favorites', limit: 1}),
-      services.tracks.list({limit: 200}),
+      services.tracks.firstPlayable(true),
+      services.tracks.firstPlayable(),
     ])
-      .then(([selected, favorites, tracks]) => {
+      .then(async ([selected, favorite, first]) => {
+        const anchor = (selected?.managedPath ? selected : null) ?? favorite ?? first;
+        const tracks = anchor ? await services.tracks.relatedCandidates(anchor) : [];
         if (alive) {
-          const anchor = selected ?? favorites[0] ?? tracks.find(track => !!track.managedPath);
           setItems(anchor ? recommendLocal(anchor, tracks, locale) : []);
         }
       })

@@ -74,6 +74,11 @@ def enableProguardInReleaseBuilds = false
  * this variant is about 6MiB larger per architecture than default.
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+def uploadKeystore = System.getenv('MUSIC_PLAYER_UPLOAD_KEYSTORE')
+def uploadStorePassword = System.getenv('MUSIC_PLAYER_UPLOAD_STORE_PASSWORD')
+def uploadKeyAlias = System.getenv('MUSIC_PLAYER_UPLOAD_KEY_ALIAS')
+def uploadKeyPassword = System.getenv('MUSIC_PLAYER_UPLOAD_KEY_PASSWORD')
+def hasReleaseSigning = [uploadKeystore, uploadStorePassword, uploadKeyAlias, uploadKeyPassword].every { it != null && !it.isBlank() }
 
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -85,8 +90,8 @@ android {
         applicationId "com.musicplayer"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode Integer.parseInt(System.getenv('MUSIC_PLAYER_VERSION_CODE') ?: '1')
+        versionName System.getenv('MUSIC_PLAYER_VERSION_NAME') ?: '1.0'
     }
     signingConfigs {
         debug {
@@ -94,6 +99,14 @@ android {
             storePassword 'android'
             keyAlias 'androiddebugkey'
             keyPassword 'android'
+        }
+        release {
+            if (hasReleaseSigning) {
+                storeFile file(uploadKeystore)
+                storePassword uploadStorePassword
+                keyAlias uploadKeyAlias
+                keyPassword uploadKeyPassword
+            }
         }
     }
     buildTypes {
@@ -106,6 +119,9 @@ android {
             // Release signing must be configured with credentials outside Git.
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }

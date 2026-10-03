@@ -22,6 +22,7 @@ export interface LyricsProvider {
 export interface LyricsRepository {
   getLocal(trackId: string): Promise<LyricsDocument | null>;
   saveLocal(trackId: string, text: string, offsetMs: number): Promise<LyricsDocument>;
+  saveEmbedded(trackId: string, text: string): Promise<LyricsDocument>;
 }
 
 export function parseLrc(text: string): LyricsDocument['lines'] {

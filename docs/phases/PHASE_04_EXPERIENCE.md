@@ -9,14 +9,16 @@ Gate: lyrics, discovery, permitted downloads, widgets and advanced player experi
 Status: IN PROGRESS
 Implemented: user-supplied plain/LRC lyrics saved per track in SQLite; timestamp parsing, binary-search active line from playback clock, and ±0.5-second saved timing offset. EN/FA Lyrics screen is accessible from track details. No lyrics leave the device.
 Evidence: parser, real SQLite repository and screen tests pass in the 59-test suite; iOS 27 simulator Debug build and three UI smoke tests pass.
-Open: native embedded lyrics extraction, approved online provider and rights gate, provider result selection, complete lyric scrolling/device accessibility checks. No external lyrics are fetched.
+Implemented since that pass: native import reads bounded iOS lyric metadata and Android MP3 ID3v2 USLT, caches it locally, and prefers later manual edits.
+Open: device verification of embedded decoding and Android formats beyond MP3, approved online provider and rights gate, provider result selection, complete lyric scrolling/device accessibility checks. No external lyrics are fetched.
 
 ### P4-T02 — Discovery
 
 Status: IN PROGRESS
 Implemented: bounded local-library suggestions ranked by shared artist, genre and album; Persian locale gets a small tie preference. The Discover tab shows the reason and opens stored songs. Unplayable fixture entries and title-only matches are excluded.
 Evidence: ranking and SQLite-backed UI tests pass.
-Open: licensed provider adapters, wider-library paging and recommendation quality/device checks. No remote recommendations or download claims.
+Implemented since the earlier pass: discovery now queries bounded playable artist/genre/album matches directly from SQLite instead of taking the first 200 titles; a real SQLite case covers matches beyond that first page.
+Open: licensed provider adapters and recommendation quality/device checks. No remote recommendations or download claims.
 
 ### P4-T03 — Permitted downloads
 

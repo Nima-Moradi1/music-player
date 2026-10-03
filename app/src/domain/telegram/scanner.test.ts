@@ -31,6 +31,12 @@ it('accepts supported audio but rejects voice, video, huge and misleading docume
       defaultTelegramPolicy,
     ),
   ).toBe(false);
+  expect(
+    eligibleFile(
+      {...music, content: 'document', file: {...music.file!, mimeType: 'application/octet-stream'}},
+      defaultTelegramPolicy,
+    ),
+  ).toBe(true);
 });
 
 it('requires consent, scans both folders, and stores the full message id only after processing', async () => {
@@ -98,4 +104,24 @@ it('resumes older pages and imports newly arrived messages without replaying the
   expect(imported).toHaveLength(52);
   expect(imported.at(-1)).toBe('101');
   expect(cursor).toEqual({newest: '101', backfill: null});
+});
+
+it('retries a transient listing failure before advancing a cursor', async () => {
+  const client = {
+    listChats: jest
+      .fn()
+      .mockRejectedValueOnce({transient: true, retryAfterMs: 0})
+      .mockResolvedValueOnce([chat])
+      .mockResolvedValueOnce([]),
+    history: jest.fn(async () => [music]),
+  };
+  const cursors = {read: jest.fn(async () => null), commit: jest.fn(async () => undefined)};
+  await scanTelegramHistory({
+    client,
+    cursors,
+    policy: {...defaultTelegramPolicy, consent: true},
+    onCandidate: async () => undefined,
+  });
+  expect(client.listChats).toHaveBeenCalledTimes(3);
+  expect(cursors.commit).toHaveBeenCalledWith(chat, music.id, null);
 });

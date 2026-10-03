@@ -56,13 +56,37 @@ function MiniPlayer({audio, open}: {audio: PlaybackController; open: (trackId: s
       </Pressable>
       <Pressable
         accessibilityRole="button"
+        accessibilityLabel={t('previousTrack')}
+        onPress={() => {
+          void audio.previous().catch(() => undefined);
+        }}
+        style={styles.miniControl}
+      >
+        <Icon name="previous" />
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
         accessibilityLabel={t(playback.playing ? 'pause' : 'play')}
         onPress={() => {
           void audio.toggle().catch(() => undefined);
         }}
         style={styles.miniControl}
       >
-        <Text>{playback.playing ? 'Ⅱ' : '▶'}</Text>
+        <Icon name={playback.playing ? 'pause' : 'play'} />
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('nextTrack')}
+        accessibilityState={{
+          disabled: playback.queue.indexOf(playback.trackId) >= playback.queue.length - 1,
+        }}
+        disabled={playback.queue.indexOf(playback.trackId) >= playback.queue.length - 1}
+        onPress={() => {
+          void audio.next().catch(() => undefined);
+        }}
+        style={styles.miniControl}
+      >
+        <Icon name="next" />
       </Pressable>
     </Row>
   );
